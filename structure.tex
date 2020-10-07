@@ -1,0 +1,196 @@
+% This is samplepaper.tex, a sample chapter demonstrating the
+% LLNCS macro package for Springer Computer Science proceedings;
+% Version 2.20 of 2017/10/04
+%
+\documentclass[runningheads]{llncs}
+%
+\usepackage{graphicx}
+% Used for displaying a sample figure. If possible, figure files should
+% be included in EPS format.
+%
+% If you use the hyperref package, please uncomment the following line
+% to display URLs in blue roman font according to Springer's eBook style:
+% \renewcommand\UrlFont{\color{blue}\rmfamily}
+
+\begin{document}
+%
+\title{Contribution Title\thanks{Supported by organization x.}}
+%
+%\titlerunning{Abbreviated paper title}
+% If the paper title is too long for the running head, you can set
+% an abbreviated paper title here
+
+\author{Finley J. Gibson\inst{1}\and
+Richard M. Everson\inst{2}\and
+Jonathan E. Fieldsend\inst{3}}
+\authorrunning{F. J. Gibson et al.}
+%
+% If there are more than two authors, 'et al.' is used.
+%
+\institute{University of Exeter, Exeter, UK
+\\ \email{f.gibson@exeter.ac.uk}\\
+\and
+University of Exeter, Exeter, UK \\
+\email{R.M.Everson@exeter.ac.uk}\\ 
+\and
+University of Exeter, Exeter, UK \\
+\email{J.E.Fieldsend@exeter.ac.uk}}
+%
+\maketitle              % typeset the header of the contribution
+
+
+\begin{abstract}
+
+\begin{itemize}
+    \item We propose SAF-mean as means of tackling EMO
+    \item We show SAF is able deliver similar performance to the current state-of-the-art without needing to compute the hypervolume, which scales poorly with increased objectives and non-dominated solutions in the objective space.
+    \item We show that approaches based on surrogate mean predictions are superior to ei approaches and suggest why we think this is. 
+ 
+\end{itemize}
+
+\keywords{First keyword  \and Second keyword \and Another keyword.}
+\end{abstract}
+%
+%
+%
+\section{Introduction}
+
+
+\begin{enumerate}
+    \item Bayesian optimisation is a balance of exploit and explore
+    \item recent work has shown that in problems with high-dimensional parameters, exploitative methods work best due to the fortuitously exploitative nature of the search resulting from low fidelity surrogate models. 
+    \item We look to capitalise on the low fidelity of multi-objective surrogate models, to improve efficient multi-objective optimisation while also side-stepping the computationally expensive, multi-dimensional integration/hypervolume calculation that tends to come with current state of the art EMOPS. 
+    \item Explicitly define the exact class of problem we intend to address:
+    \begin{itemize}
+        \item Multi-objective (2:10 objectives)
+        \item Black box functions
+        \item multi-dimensional parameter space.
+        \item Either every objective is expensive to evaluate, or multiple objectives are jointly evaluated through some expensive process.
+    \end{itemize}
+    \item Explain which of \cite{hwang2012multiple} approaches we intend to take to solving the MOP: Approximate the Pareto front so that a solution can be selected a posteriori.
+\end{enumerate}
+
+\section{Background}
+\begin{enumerate}
+    \item Bayesian optimisation
+    \begin{itemize}
+        \item process description
+        \item surrogate role
+        \item acquisition function role
+        \item pseudocode
+    \end{itemize}
+    \item Multi-objective Bayesian Optimisation
+    \begin{itemize}
+        \item Brief summary of MO, stating goals and common assessment methods (Dominated Hypervolume, IGD/IGD+)
+        \item How Bayesian optimisation translates to MO problems.
+        \item multi/mono surrogate
+        \item role of acquisition function in combing objectives into scalar assessment of query point suitability. 
+    \end{itemize}
+    \item current state of the art
+    \begin{itemize}
+        \item Par-Ego highly regarded but out-dated. Randomises weighting between objectives and scales accordingly. Still valued for its computational efficiency.
+        \item Discuss EMO approaches where acquisition function/infill criterion combines objectives. Original SAF paper, Alma paper comparing infill criteria.
+        \item evidence suggests Greedy may be desirable in high dimensional parameter space problems for single objective problems with high dimension parameter spaces (George paper).
+        \item Sms-ego current gold standard.
+        \item sms-ego improvements by altering the penalty applied to the dominated region.
+    \end{itemize}
+\end{enumerate}
+
+\section{Our Algorithm}
+\begin{enumerate}
+    \item Explain how we intend to combine the `greedy` approach demonstrated by george, with the SAF from the original SAF paper, and use SAF, driven by the mean surrogate , as our method of optimisation. 
+    \item Explain how we think Almas MPOI approach failed to take advantage of Georges research showing "greedy is good". 
+    \item Show pseudo-code for SAF with mean prediction. 
+\end{enumerate}
+
+\section{Our hypothesis}
+\begin{itemize}
+    \item In accordance with George's work, as parameter space dimensions increase, saf mu will be best, because "purely exploitative method is fortuitously exploratory because of the low fidelity surrogate modelling"
+\end{itemize}
+
+
+\section{Experimental evaluation}
+\begin{enumerate}
+    \item describe algorithms to be compared
+        \begin{table}
+        \caption{Objective functions to be assessed}\label{tab1}
+        \begin{tabular}{|l|l|l|l|}
+        \hline
+        Optimiser name & alpha & mono/multi surrogate  & Comment\\
+        \hline
+        Saf & $\mu$ & Multi & Our suggested Optimiser  \\
+        Saf & ei & Multi & EI version of SAF for to affirm greedy=good. \\
+        SmsEgo & ei & Multi & Current SOA \\
+        ParEgo & ei & Mono & Efficient computation \\
+        Mpoi & ei & Multi & Benchmark for EMO over infill criteria approach. \\
+        LHS & NA & None & Baseline comparison to pseudo-uniform sampling of parameter space. \\
+        \hline
+        \end{tabular}
+        \end{table}
+    \item describe test functions, and why they were chosen.:
+        \begin{table}
+        \caption{Objective functions to be assessed}\label{tab1}
+        \begin{tabular}{|l|r|l|r|l|}
+        \hline
+        Problem name &  Objectives & Domain & $d$ & Comment\\
+        \hline
+        WFG2 & 3 & $[0, 2d]^d$ & $5$ & multi-modal, discontinuous Pareto front, non-separatle\\
+        WFG4 & 3 & $[0, 2d]^d$ & $5$ & multi-modal, separable\\
+        WFG5 & 5 & $[0, 2d]^d$ & $5$ & separable, non-mixed parameters\\
+        WFG6 & 2 & $[0, 2d]^d$ & $5$ & non-separable, non-mixed parameters\\
+        WFG6 & 3 & $[0, 2d]^d$ & $5$ & non-separable, non-mixed parameters\\
+        WFG6 & 5 & $[0, 2d]^d$ & $5$ & non-separable, non-mixed parameters\\
+        WFG6 & 10 & $[0, 2d]^d$ & $5$ & non-separable, non-mixed parameters\\
+        LZ09-F5 & 2 & $[0,1] \times [-1,1]^{n-1}$ & $2$ & Complex Pareto front mapping. \\
+        LZ09-F6 & 3 & $[0,1]^2 \times [-2,2]^{n-2}$ & $2$ &Complex Pareto front mapping.\\
+        \hline
+        \end{tabular}
+        \end{table}
+
+\item Describe assessment criterion (hypervolume/igd+)
+\item show results comparing SAF-mean, SAF-greed, Sms-Ego, ParEgo, Mpoi, Lhs.
+\end{enumerate}
+
+\section{Discussion}
+\begin{enumerate}
+    \item Discuss results showing SAF-mean comparable with Sms-Ego
+    \item Discuss SAF-ei poor performance
+    \item Compare objective space images and suggest potential reasons for poor SAF-ei:
+        \begin{itemize}
+            \item \textbf{Theorem 1} Surface behind Pareto front in objective space as key reason. (Paper improving SmsEgo clearly thinks this region is significant).  
+            \item \textbf{Theorem 2} Over optimism in model allows probability distribution to stray into unattainable region of objective space. High dimensionality of parameter/objective space causes high model uncertainty exacerbating this issue. 
+        \end{itemize}
+\end{enumerate}
+
+\subsection{Investigation into Theorems}
+\begin{enumerate}
+    \item Show hybrid algorithm performance.
+    \begin{itemize}
+        \item SAF-mean behind Pareto front / SAF-ei beyond. Exploration/Exploitation is still based on SAF-ei, but the flat area is removed and replaced with something we know works well.
+        \item SmsEgo behind Pareto front / SAF-mean beyond. 
+        \item SAF-mean behind Pareto front / SmsEgo beyond. 
+    \end{itemize}
+    \item Compare all algorithms with and without ei. 
+    \item Discuss findings:
+        \begin{itemize}
+            \item SAF-ei not improved by substituting known efficient method behind front.
+            \item All combinations of SmsEgo and Saf-mean work similarly well, suggesting the problem lies within the expected improvement. 
+            \item Algorithms improved by not using ei
+            \item Offer further evidence in objective space plots of optimisation. Show boundary interactions, show Monte-carlo sample point clouds. 
+        \end{itemize}
+\end{enumerate}
+
+\subsection{Conclusion}
+\begin{enumerate}
+    \item We have introduced SAF-mean as a means of solving EMOs.
+    \item Showed SAF-mean similar to SmsEgo performance, without need for hypervolume itegration.
+    \item We have further shown that EI based models are flawed when it comes to complex EMO problems, with high dimensional feature spaces and offered an explanation, with evidence, for why this is. 
+    \item Furhter work: Not needing to leverage posterior prediction uncertainty opens the EMO strategy up to a wider range of surrogate models. Some of which (e.g. Random Forests) are not as severely limited by the \textit{curse of dimensionality} as GPs, and this could allow EMO to be applied to many objective problems. 
+\end{enumerate}
+
+
+\clearpage
+\bibliographystyle{splncs04}
+\bibliography{bibliography}
+
+\end{document}

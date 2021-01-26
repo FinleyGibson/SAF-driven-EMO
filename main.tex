@@ -1,8 +1,36 @@
-% This is samplepaper.tex, a sample chapter demonstrating the
-% LLNCS macro package for Springer Computer Science proceedings;
-% Version 2.20 of 2017/10/04
-%
-\documentclass[runningheads]{llncs}
+
+%%
+%% This is file `sample-authordraft.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% samples.dtx  (with options: `authordraft')
+%% 
+%% IMPORTANT NOTICE:
+%% 
+%% For the copyright see the source file.
+%% 
+%% Any modified versions of this file must be renamed
+%% with new filenames distinct from sample-authordraft.tex.
+%% 
+%% For distribution of the original source see the terms
+%% for copying and modification in the file samples.dtx.
+%% 
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+%%
+%% The first command in your LaTeX source must be the \documentclass command.
+
+
+
+\documentclass[sigconf,margin=15mm]{acmart}
+
+\usepackage{booktabs,multirow,array,caption,hhline}
+\newcolumntype{N}{@{}m{0pt}@{}}
+%\usepackage[margin=15mm]{geometry}
 %
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -98,66 +126,213 @@
 \newcommand*{\ie}{i.e.\@\xspace}
 \newcommand*{\etal}{\textit{et al.}\@\xspace}
 
+%\documentclass[sigconf,authordraft]{acmart}
+
+%% NOTE that a single column version may be required for 
+%% submission and peer review. This can be done by changing
+%% the \doucmentclass[...]{acmart} in this template to 
+%% \documentclass[manuscript,screen,review]{acmart}
+%% 
+%% To ensure 100% compatibility, please check the white list of
+%% approved LaTeX packages to be used with the Master Article Template at
+%% https://www.acm.org/publications/taps/whitelist-of-latex-packages 
+%% before creating your document. The white list page provides 
+%% information on how to submit additional LaTeX packages for 
+%% review and adoption.
+%% Fonts used in the template cannot be substituted; margin 
+%% adjustments are not allowed.
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    \normalfont B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}
+
+%% Rights management information.  This information is sent to you
+%% when you complete the rights form.  These commands have SAMPLE
+%% values in them; it is your responsibility as an author to replace
+%% the commands and values with those provided to you when you
+%% complete the rights form.
+
+%%%%%%%%%% COPYRIGHT COMMENTED OUT BY ME
+%\setcopyright{acmcopyright}
+%\copyrightyear{2018}
+%\acmYear{2018}
+%\acmDOI{10.1145/1122445.1122456}
+
+
+%% These commands are for a PROCEEDINGS abstract or paper.
+\acmConference[GECCO '21]{Genetic and Evolutionary Computation Conference}{July 10--14, 2021}{Lille, France}
+\acmBooktitle{Genetic and Evolutionary Computation Conference,
+  July 10--14, 2021, Lille, France}
+\acmPrice{15.00}
+\acmISBN{978-1-4503-XXXX-X/18/06}
+
+
+%%
+%% Submission ID.
+%% Use this when submitting an article to a sponsored event. You'll
+%% receive a unique submission ID from the organizers
+%% of the event, and this ID should be used as the parameter to this command.
+%%\acmSubmissionID{123-A56-BU3}
+
+%%
+%% The majority of ACM publications use numbered citations and
+%% references.  The command \citestyle{authoryear} switches to the
+%% "author year" style.
+%%
+%% If you are preparing content for an event
+%% sponsored by ACM SIGGRAPH, you must use the "author year" style of
+%% citations and references.
+%% Uncommenting
+%% the next command will enable that style.
+%%\citestyle{acmauthoryear}
+
+%%
+%% end of the preamble, start of the body of the document source.
 \begin{document}
+
 %
-\title{Contribution Title\thanks{Supported by organization x.}}
+\title{Multi-objective Bayesian optimisation using a summary attainment front acquisition function}
 %
 %\titlerunning{Abbreviated paper title}
 % If the paper title is too long for the running head, you can set
 % an abbreviated paper title here
 
-\author{Finley J. Gibson\inst{1}\and
-Richard M. Everson\inst{2}\and
-Jonathan E. Fieldsend\inst{3}}
-\authorrunning{F. J. Gibson et al.}
-%
-% If there are more than two authors, 'et al.' is used.
-%
-\institute{University of Exeter, Exeter, UK
-\\ \email{f.gibson@exeter.ac.uk}\\
-\and
-University of Exeter, Exeter, UK \\
-\email{R.M.Everson@exeter.ac.uk}\\ 
-\and
-University of Exeter, Exeter, UK \\
-\email{J.E.Fieldsend@exeter.ac.uk}}
-%
-\maketitle              % typeset the header of the contribution
+\author{Finley J. Gibson}
+\email{f.gibson@exeter.ac.uk}
+\orcid{}
+\affiliation{%
+  \institution{University of Exeter}
+  \country{UK}
+}
+
+
+\author{Richard M. Everson}
+\email{R.M.Everson@exeter.ac.uk}
+\orcid{}
+\affiliation{%
+  \institution{University of Exeter}
+  \country{UK}
+}
+
+\author{Jonathan E. Fieldsend}
+\email{J.E.Fieldsend@exeter.ac.uk}
+\orcid{0000-0002-0683-2583}
+\affiliation{%
+  \institution{University of Exeter}
+  \country{UK}
+}
+
+
 
 
 \begin{abstract}
 
-\begin{itemize}
-    \item We propose SAF-mean as means of tackling EMO
-    \item We show SAF is able deliver similar performance to the current state-of-the-art without needing to compute the hypervolume, which scales poorly with increased objectives and non-dominated solutions in the objective space.
-    \item We show that approaches based on surrogate mean predictions are superior to ei approaches and suggest why we think this is. 
+    Efficient methods for optimising expensive black-box problems with multiple objectives can often themselves become prohibitively expensive as the number of objectives is increased. We propose an approach to efficient optimisation of such problems without the reliance on hypervolume and expected improvement computation, which are the principal causes of poor dimensional scaling in current state-of-the-art  approaches.  We show that our approach is able deliver similar performance to the current state-of-the-art, and further show that approaches based on surrogate mean predictions are superior to the widely used \textit{expected improvement} when\mnote{with?} the Gaussian process surrogate models, typically applied. Performance is evaluated on the well-known Walking Fish Group problem set, against current state-of-the art approaches. 
  
-\end{itemize}
 
-\keywords{First keyword  \and Second keyword \and Another keyword.}
+
 \end{abstract}
+
+
+%%%%%%%%%%%%%%%%%%%%%%% From Alma's 2017 GECCO paper -- might need modification 
+%
+% The code below should be generated by the tool at
+% http://dl.acm.org/ccs.cfm
+% Please copy and paste the code instead of the example below.
+%
+\begin{CCSXML}
+<ccs2012>
+%<concept>
+%<concept_id>10002950.10003648.10003670.10003676</concept_id>
+%<concept_desc>Mathematics of computing~Expectation maximization</concept_desc>
+%<concept_significance>500</concept_significance>
+%</concept>
+<concept>
+<concept_id>10002950.10003648.10003671</concept_id>
+<concept_desc>Mathematics of computing~Probabilistic algorithms</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10010147.10010341.10010342.10010343</concept_id>
+<concept_desc>Computing methodologies~Modeling methodologies</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10010147.10010257.10010293.10010075.10010296</concept_id>
+<concept_desc>Computing methodologies~Gaussian processes</concept_desc>
+<concept_significance>300</concept_significance>
+</concept>
+<concept>
+<concept_id>10010405.10010481.10010484.10011817</concept_id>
+<concept_desc>Applied computing~Multi-criterion optimization and decision-making</concept
+_desc>
+<concept_significance>500</concept_significance>
+</concept>
+</ccs2012>
+\end{CCSXML}
+
+%\ccsdesc[500]{Mathematics of computing~Expectation maximization}
+\ccsdesc[500]{Computing methodologies~Gaussian processes}
+\ccsdesc[500]{Applied computing~Multi-criterion optimization and decision-making}
+\ccsdesc[500]{Mathematics of computing~Probabilistic algorithms}
+\ccsdesc[500]{Computing methodologies~Modeling methodologies}
+
+
+%%%%%%%%%%%% End Alma's paper %%%%%%%%%%%%%%%%%%%%%
+%%
+%% The code below is generated by the tool at http://dl.acm.org/ccs.cfm.
+%% Please copy and paste the code instead of the example below.
+%%
+%\begin{CCSXML}
+%<ccs2012>
+% <concept>
+%  <concept_id>10010520.10010553.10010562</concept_id>
+%  <concept_desc>Computer systems organization~Embedded systems</concept_desc>
+%  <concept_significance>500</concept_significance>
+% </concept>
+% <concept>
+%  <concept_id>10010520.10010575.10010755</concept_id>
+%  <concept_desc>Computer systems organization~Redundancy</concept_desc>
+%  <concept_significance>300</concept_significance>
+% </concept>
+% <concept>
+%  <concept_id>10010520.10010553.10010554</concept_id>
+%  <concept_desc>Computer systems organization~Robotics</concept_desc>
+%  <concept_significance>100</concept_significance>
+% </concept>
+% <concept>
+%  <concept_id>10003033.10003083.10003095</concept_id>
+%  <concept_desc>Networks~Network reliability</concept_desc>
+%  <concept_significance>100</concept_significance>
+% </concept>
+%</ccs2012>
+%\end{CCSXML}
+
+%\ccsdesc[500]{Computer systems organization~Embedded systems}
+%\ccsdesc[300]{Computer systems organization~Redundancy}
+%\ccsdesc{Computer systems organization~Robotics}
+%\ccsdesc[100]{Networks~Network reliability}
+
+%%
+%% Keywords. The author(s) should pick words that accurately describe
+%% the work being presented. Separate the keywords with commas.
+\keywords{Expensive optimisation, Bayesian optimisation, Infill criterion, Acquisition functions.}
+\maketitle
 %
 %
 %
 \section{Introduction}
-In strategies for the efficient global optimisation of black-box functions, a balance must be struck between, exploiting current knowledge about the underlying function in order to find good solutions, and exploring the function further in order to advance this knowledge. There is a wealth of research in the literature for managing this balance when solving single-objective optimisation problems, and well established strategies for solving such problems with as few evaluations of the black-box function as possible. 
+The process of optimising black-box functions relies exclusively on querying the underlying objective function in order to advance the understanding of the parameter objective-space mapping of, and converge toward, an optimal solution. During the optimisation process a balance must be struck between the exploitation of the function as currently understood, in order to find good solutions, and further exploration of the unknown regions of its landscape in order to advance this understanding. Extensive work has gone into theorising how this balance should be managed, particularly in cases where there is a high cost associated with querying the underlying objective. In such cases careful management of this balance is essential if a suitable solution is to be found as efficiently as possible. Bayesian optimisation\cite{jones1998efficient} has emerged as an effective means of solving such problems, and has been widely applied to many problems with success.
 
-These methods of efficient global optimisation often depend on generating inexpensive surrogates to model the true function, which can then be investigate in an inexpensive manner. In the field of multi-objective optimisation, efforts have been made to employ similar, efficient optimisation strategies but a common problem with these approaches is that the typical surrogate models used do not scale well to higher dimensions, and the integration commonly required in such approaches scales poorly with increased dimensionality. 
+In the field of multi-objective optimisation (MOO), efforts have been made to employ similar strategies to those used for single objective optimisation, but accurately modelling the multi-dimensional objective space is more challenging, and many techniques used in single-objective optimisation require complex volume measurement and integration which scale poorly in the higher dimensional objective spaces associated with multi-objective problems (MOPs). One widely used technique is the computation of the expected improvement (EI) to manage the exploitation/exploration trade-off. However, recent work has shown that in single objective problems with high-dimensional parameter spaces, the low fidelity between the commonly used surrogate models and the underlying function reduces the need to actively explore the function. Instead purely exploitative methods have been demonstrated to outperform methods which balance the explore/exploit trade-off, when the fidelity between the surrogate and true function is low \cite{death2020greed}. With this in mind we look apply to this exploitative approach to the multi-objective domain, where we believe the increased complexity of modelling problems with multi-dimensional outputs will enjoy similar benefits of an exploitative approach. 
 
-Recent work has shown that in problems with high-dimensional parameter spaces, the low fidelity between the surrogate models and the underlying function reduces the need to actively explore the function. Instead purely exploitative methods have been demonstrated to outperform methods which balance the explore/exploit trade-off, when the fidelity between the surrogate and true function is low. With this in mind we look apply this exploitative approach to the multi-objective domain, where we believe the complex nature of modelling problems in multiple dimensions will provide a similar advantage to exploitative methods. Additionally, demonstrating that purely exploitative methods are sufficient to drive efficient multi-objective optimisation will reduce the need for the expensive multidimensional integration, and open the surrogate modelling up to to functions which do not provide the uncertainty associated with its predictions. 
-
-In real world optimisation there often exist problems which are comprised of multiple desirable objectives that are dependant on the same set of parameters \cite{marler2004survey}. In many cases these objectives conflict, and finding a solution which satisfies one objective neither guarantees, nor indicates satisfaction of the other objectives. These multi-objective optimisation problems (MOPs) do not have a single solution, but rather a set of uniquely optimal solutions lying on some surface within the $n$ dimensional objective space. This surface is known as the the Pareto front.
-
-In this paper we address a particular subset of these MOPs, for which some cost associated with the evaluation of the objectives for a set of parameters is significant, and restricts the number of queries of the objective function can be made, for unique parameter configurations. This can be because either each objective is independently expensive and requires a separate evaluation or, more commonly, all objectives are jointly evaluated by a single expensive process. In such MOPs the goal of the optimisation process is to find a suitable solution in as few evaluations of the objective as possible. These expensive multi-objective problems (EMOPs), are typically represented as black-box functions, where the suitability of a candidate solution can only be quantified by evaluation of the true objective function, and no information beyond the suitability of the evaluated solutions can be deduced from the evaluation.   
-
-The advent of large-scale simulation, and optimisation problems that require physical experimentation to evaluate the objective has brought this class of EMOPs to the fore as an important area of research. This class of problem is common in real-world applications, particularly in the fields of engineering and computer modelling. For example, when engineering a component based on some design parameters, performance evaluation of a newly proposed design may require making and testing the component, incurring both time and material costs \cite{fang2017design}. Alternately, computationally expensive processes such as fluid dynamic simulation or machine learning model evaluation, often have high computational costs associated with them and can take hours or even days to process \cite{huband2005scalable}. This renders optimiser classes such as Multi-Objective Evolutionary Algorithms (MOEAs) \cite{tanabe2017benchmarking,coello2007evolutionary} or Multi-Objective Genetic Algorithms (MOGAs) \cite{tamaki1996multi}, for which a large number of objective evaluations are required, unsuitable. 
-
-Without a single optimal solution against which to measure performance, and a potentially infinite set of uniquely optimal solutions on the Pareto front, the approach we will be considering to solving these problems involves finding a set of parameters which return a set of non-dominated, objective-space solutions which approximate the Pareto front as closely as possible, a final solution can then be selected a posteriori. 
+In this paper we address a particular set of MOPs, for which some cost associated with the evaluation of the objectives for a set of parameters is significant, and restricts the number of queries of the objective function can be made. This can be because either each objective is independently expensive and requires a separate evaluation or, more commonly, all objectives are jointly evaluated by a single expensive process. In such MOPs the goal of the optimisation process is to find a suitable solution in as few evaluations of the objective as possible. The advent of large-scale simulation, and optimisation problems that require physical experimentation to evaluate the objective has brought this class of Efficeint MOPs (EMOPs) to the fore as an important area of research. This class of problem is common in real-world applications, particularly in the fields of engineering and computer modelling. For example, when engineering a component based on some design parameters, performance evaluation of a newly proposed design may require making and testing the component, incurring both time and material costs \cite{fang2017design}. Alternately, computationally expensive processes such as fluid dynamic simulation or machine learning model evaluation, often have high computational costs associated with them and can take hours or even days to process \cite{huband2005scalable}. This renders optimiser classes such as Multi-Objective Evolutionary Algorithms (MOEAs) \cite{tanabe2017benchmarking,coello2007evolutionary} or Multi-Objective Genetic Algorithms (MOGAs) \cite{tamaki1996multi}, for which a large number of objective evaluations are required, unsuitable. 
 
 \section{Background}
 \subsection{Bayesian Optimisation}\label{section:background_BayesianOptimisation}
 Bayesian optimisation is a method of efficient global optimisation (EGO), which searches for the global optimum
-solution to an objective function $f(\mathbf{x})$ for  $f: \Omega \subset \mathbb{R}^{n} \mapsto \mathbb{R}$, with as few evaluations of the objective function as possible. In order to limit objective function evaluations, in BO a small number of evaluations of the true objective function are made, and a probabilistic surrogate model is generated from these evaluations. This surrogate model, which should be cheap to evaluate, can then be used to predict the efficacy of subsequent candidate solutions without the need to frequently evaluate $f$. 
+solution to an objective function $f(\mathbf{x})$ for  $f: \Omega \subset \mathbb{R}^{n} \mapsto \mathbb{R}$, with as few evaluations of the objective function as possible. In BO, in order to limit the number of evaluations required of the true objective function,  a small number of initial evaluations n are made, and a probabilistic surrogate model is then generated from these evaluations. This surrogate model, which should be cheap to evaluate, can then be used to predict the efficacy of subsequent candidate solutions without the need to frequently evaluate $f$. 
 
 \begin{algorithm}[t]
   \SetAlgoLined
@@ -258,16 +433,20 @@ Practical experience shows that multi-surrogate methods tend to be superior to m
 Acquisition functions are more complex in MOPs than in single objective Bayesian optimisation, as the acquisition function must additionally combine the vector of surrogate predictions for each objective into a scalar value. Generalisations of EI and PI to MOPs have been made by deploying mono-surrogates to jointly model the parameter space/objective space mapping, and then multi-dimensional integration applied to calculate the probability density function for a given set of parameters \cite{emmerich2006single,keane2006statistical}. The disadvantage of this is that multi-dimensional integration is computationally expensive and quickly becomes impractical due to the \textit{curse of dimensionality} associated with the dimensional increase resulting from the inclusion of additional objectives. More generally the acquisition function involves a function to interpolate between the explored points in the objective space, and then posterior predictions from the surrogate/surrogates are evaluated against this in order to quantify their suitability as candidates. 
 
 \subsection{Related work}\label{section:related_work}
-Bayesian approaches to solving EMOPs tend to use Gaussian Process surrogates and largely differ in the acquisition functions by which candidates for evaluation by the true objective function are assessed.  Acquisition functions which have proven most effective leverage measurement of the expected improvement to the hypervolume dominated by the the current set of non-dominated solutions (or $\mathcal{S}$-metric) \cite{emmerich2008computation}, resulting from the inclusion of the model posterior prediction. First suggested by Emmerich \cite{emmerich2006single} as a pre-screening method for assisting GA optimisation, this approach naturally converges well towards a set of solutions which well represent the Pareto front, as maximising the dominated hypervolume and finding the true Pareto set are equivalent \cite{fleischer2003measure}. However, the computation required for the dominated hypervolume scales poorly with both increased dimensionality of the objective space and increased number of non-dominated solutions, with even the most efficient algorithms scaling as $O(n^D)$, where $n$ is the number of points in the non-dominated set $\mathcal{P}\in\{\bx_1, \cdots, \bx_n\}$, for up to tri-objective problems, and potentially worse beyond that \cite{hupkens2014faster}. Furthermore increasing $D$ is often tied to a further increase in $n$ as there is greater scope for optimality in at any one combination of objectives. This quickly becomes intractable as the number of objectives increases. Nevertheless acquisition functions which compute the hypervolume improvement currently make up the stat-of-the art for EMO. SMS-EGO \cite{ponweiser2008multiobjective,wagner2010expected} performs well for problems with few objectives, and reduces the need for computation of the expected improvement to the hypervolume by applying a cheaper penalty function for predictions which fall within the region dominated $\mathcal{P}$. However, optimisation depends on the stetting of a well-placed reference point for the $\mathcal{S}$-metric calculation. Positioning of this reference vector requires some knowledge of the scales of the objective space, and poor positioning can bias the optimisation in favour of some objectives. 
+Bayesian approaches to solving EMOPs tend to use Gaussian Process surrogates and largely differ in the acquisition functions by which they select the parameters at which to next evaluate the true objective function.
 
-Less expensive methods exist and involve dynamically altering the weighting applied to each objective during the optimisation process. Parego\cite{knowles2006parego}, does this by generating a random weight vector periodically and applying this vector to linearly combine the weighted objectives. Operating on a mono-surrogate model this is computationally efficient, and is well regarded in that respect, and while it will produce a set of solutions approximating the Pareto set, it converges in many more evaluations of the true objective function than the more computationally expensive methods previously mentioned. Alternatively, simpler methods which model the desirability of posterior predictions by interpolating the unexplored regions between objective-space observations have been implemented with success. Keane \cite{keane2006statistical} uses the signed objective-space euclidean distance to the nearest point in $\mathcal{P}$ to interpolate between observations and then the EI is computed over this to form the acquisition function. However, as discussed in \cite{wagner2010expected} this fails to preserve the dominance relation, and is outperformed by SMS-EGO. Svenson \cite{svenson2016multiobjective} retains the dominance relation by using the maximin distance between the GP posterior prediction and the nearest point in the non-dominated set $\mathcal{P}$. The EI is then approximated using inexpensive Monte-Carlo estimation. In experiments on the DTLZ problems it is shown to perform comparably with measures of improvement to the dominated hypervolume without the. Although neither of these interpolation methods require setting of a reference point as in SMS-EGO, they are susceptible to bias depending on the scales of the objectives. Rahat \etal \cite{rahat2017alternative} compare a range of acquisition functions arguing that, although performance seems problem dependant, their proposed inexpensive minimum probability of improvement (MPoI) acquisition function performs comparably to using the hypervolume improvement, and similarly to the well known ParEgo algorithm \cite{knowles2006parego}, all such inexpensive acquisition functions however are surpassed consistently by the SMS-EGO state of the art. Acquisition functions which use a closed expression for the EI are well established in single objective optimisation, and leverage the uncertainty associated with each prediction to improve the effectiveness of candidate solution. However, it has recently been suggested that exploitative optimisation methods are preferable over those which balance exploit/explore  such as EI in problems where the complexity of the problem, indicated by the high dimensional parameter space, causes low fidelity between the surrogate models and the objective function \cite{death2019greed}. They argue that exploitative methods are sufficiently, fortuitously exploitative in their nature without the need for active exploration. 
+The Acquisition functions which have proven most effective leverage measurement of the expected improvement to the $\mathcal{S}$-metric  \cite{emmerich2008computation}. That is the expected improvement to the hypervolume of objective space which is dominated by the the set of Pareto optimal solutions resulting from the inclusion of the GP model posterior prediction. First suggested by Emmerich \cite{emmerich2006single} as a pre-screening method for assisting GA optimisation, this approach naturally converges towards a set of solutions which well represent the Pareto front, as maximising the dominated hypervolume and finding the true Pareto set are equivalent \cite{fleischer2003measure}. 
 
+However, the computation required for the dominated hypervolume scales poorly with both increased dimensionality of the objective space and increased number of Pareto-optimal solutions in the set of points evaluated by the true objective function. With even the most efficient algorithms scaling as $O(n^D)$, where $n$ is the number of points in the non-dominated set $\mathcal{P}\in\{\bx_1, \cdots, \bx_n\}$, for up to tri-objective problems, and potentially worse beyond that \cite{hupkens2014faster}. Furthermore increasing $D$ is often tied to a further increase in $n$ as there is greater likelihood of unique optimality in at least one combination of objectives and current methods of hypervolume computation quickly become intractable as the number of objectives increase. Nevertheless acquisition functions which compute the hypervolume improvement currently make up the stat-of-the art for EMO. SMS-EGO \cite{ponweiser2008multiobjective,wagner2010expected} performs well for problems with few objectives, and reduces the need for computation of the expected improvement to the hypervolume by applying a cheaper penalty function for predictions which fall within the region dominated $\mathcal{P}$. However, optimisation depends on the stetting of a well-placed reference point for the $\mathcal{S}$-metric calculation. Positioning of this reference vector requires some knowledge of the scales of the objective space, and poor positioning can bias the optimisation in favour of some objectives. 
 
+Less expensive methods exist and involve dynamically altering the weighting applied to each objective during the optimisation process. Parego\cite{knowles2006parego}, does this by periodically generating a random weight vector which dictates the relative importance of each objective. Operating on a mono-surrogate model this is computationally efficient, and is well regarded in that respect, and while it will produce a set of solutions approximating the Pareto set, it converges in many more evaluations of the true objective function than SMS-EGO.
 
-\section{Proposed method}
-We propose combining several of the independently observed beneficial components discussed in section \ref{section:related_work}, by using the inexpensive and dominance preserving maximin function described in \cite{svenson2016multiobjective}, forgoing the EI computation in favour of a more exploitative approach, as explored in \cite{death2019greed}, and using a multi-surroage model built from GPs to accurately model the objective function. To achieve this we will use the surrogate assisted EMO strategy with GP surrogates, as proposed by Emmerich \cite{emmerich2006single} using a multi-surrogate GP model, but using only the mean prediction of the surrogates when making predictions about new parameters, in order to emphasise exploitation, and hope that the complexity of MOPs will produce sufficient fortuitous exploration, without the need to actively pursue it. We propose combining the surrogate predictions of such maximia through an acquisition function which uses the maximin distance from the non-dominated observations. 
+Alternatively, simpler methods which model the desirability of posterior predictions by interpolating the unexplored regions between observations in objective-space have been implemented with success. Keane \cite{keane2006statistical} uses the signed objective-space euclidean distance to the nearest point in $\mathcal{P}$ to interpolate between observations and then the EI is computed over this to form the acquisition function. However, as discussed in \cite{wagner2010expected} this fails to preserve the dominance relation, and is outperformed by SMS-EGO. Svenson \cite{svenson2016multiobjective} retains the dominance relation by using the maximin distance between the GP posterior prediction and the nearest point in the non-dominated set $\mathcal{P}$. The EI is then approximated using inexpensive Monte-Carlo estimation. In experiments on the DTLZ problems it is shown to perform comparably with measures of improvement to the dominated hypervolume. Although neither of these interpolation methods require setting of a reference point as in SMS-EGO, they are susceptible to bias depending on the scales of the objectives. Rahat \etal \cite{rahat2017alternative} compare a range of acquisition functions arguing that, although performance seems problem dependant, their proposed inexpensive minimum probability of improvement (MPoI) acquisition function performs comparably to using the hypervolume improvement, and similarly to the well known ParEgo algorithm \cite{knowles2006parego}, all such inexpensive acquisition functions however are surpassed consistently by the SMS-EGO state of the art.
 
-Initially we will take Pseudocode for our proposed algorithm can be seen in Algorithm \ref{alg:ourAlg_pseudocde}.
+In single-objective Bayesian optimisation, it has recently been suggested that exploitative optimisation methods are preferable over those which balance exploit/explore, such as EI, in problems where the complexity of the problem, causes low fidelity between the surrogate models and the objective function \cite{death2019greed}. They argue that exploitative methods are sufficiently \textit{fortuitously} exploitative in their nature without the need for active exploration. This work showed that deploying an exploitative, $\epsilon$-greedy' optimisation strategy was often preferable in problems where the parameter space was high-dimensional and thus the objective function complex.
+
+\section{Proposed method}\label{section:our_method}
+We propose combining several components discussed in section \ref{section:related_work}, which have independently demonstrated advantages in efficient optimisation, be it in the domain of single or multi-objective optimisaiont. We propose a Bayesian approach to optimisation using GPs to model the objective function, and using the inexpensive and dominance preserving maximin function described in \cite{svenson2016multiobjective}, but forgoing the popular EI computation in favour of a more exploitative approach as explored in \cite{death2019greed}. To achieve this we will use the surrogate assisted EMO strategy with GP surrogates, as proposed by Emmerich \cite{emmerich2006single} using a multi-surrogate GP model, but using only the mean prediction of the surrogates when making predictions about new parameters, in order to emphasise exploitation, and hope that the complexity of MOPs will produce sufficient fortuitous exploration, without the need to actively pursue it. We propose combining the surrogate predictions of such maximia through an acquisition function which uses the maximin distance from the non-dominated observations. Pseudo-code for our proposed algorithm can be seen in Algorithm \ref{alg:ourAlg_pseudocde}.
 
 \begin{algorithm}[t!]
   \SetAlgoLined
@@ -307,25 +486,26 @@ Initially we will take Pseudocode for our proposed algorithm can be seen in Algo
 \end{algorithm}
 
 
-\section{Experimental evaluation}
-In order to assess the effectiveness of our proposed algorithm, we compare it to several others, including the state-of-the-art SMS-EGO, on the well-known walking fish group (WFG) problems \cite{huband2005scalable}, and measure the performance of the algorithms according to the dominated hypervolume (DHV), and the inverted generational distance plus (IGD+).
 
-The algorithms to be compared are laid out in table \ref{table:alg_table} below. They include our proposed method, as well as the non-exploitative version originally proposed by Svenson \cite{svenson2016multiobjective}. We also include the state-of-the-art SMS-EGO and, in order to further investigate the potential benefits of an exploitative method, a version of SMS-EGO where the uncertainty  associated with each model prediction is set to zero. We will also be comparing the minimum probability of improvement (MPoI) method proposed by Rahat \cite{rahat2017alternative}, and ParEgo in order to see how similarly efficient methods compare.
+\section{Experimental evaluation}
+In this section we compare the approach proposed in section \ref{section:our_method} to several others on the well-known walking fish group (WFG) problems \cite{huband2005scalable}. We measure the performance of the algorithms according to the dominated hypervolume (DHV), and the inverted generational distance plus (IGD+).
+
+The algorithms to be compared are laid out in table \ref{table:alg_table} below. They include our proposed method, as well as the non-exploitative version originally proposed by Svenson \cite{svenson2016multiobjective}. We also include ParEGO as a benchmark for methods which do not use the hypervolume computation as well as SMS-EGO. Furthermore, we also include a version of SMS-EGO where the uncertainty  associated with each model prediction is set to zero, in order to further investigate the potential benefits of an exploitative method. We will also be comparing the minimum probability of improvement (MPoI) method proposed by Rahat \cite{rahat2017alternative}, and a pure LHS sample of the parameter space.
 
 \begin{table}
-    \caption{Objective functions to be compared}\label{tab1}
+    \caption{Optimisation strategies to be compared}\label{tab1}
     \label{table:alg_table}
-    \begin{tabular}{|l|l|l|l|}
+    \begin{tabular}{|l|l|l|}
         \hline
-        Optimiser name & alpha & mono/multi surrogate  & Comment\\
+        Optimiser name & surrogate  & Comment\\
         \hline
-        Saf & ei & Multi & EI version of SAF, as proposed in \cite{svenson2016multiobjective}. \\
-        Saf & $\mu$ & Multi & Our proposed Optimiser. (See Alg. \ref{alg:ourAlg_pseudocde}) \\
-        SmsEgo & ei & Multi & Current SOA \\
-        SmsEgo & $\mu$ & Multi & Modification to current SOA to be more exploitative.\\
-        ParEgo & ei & Mono & Efficient computation \\
-        MPoI & NA & Multi & Benchmark for EMO over infill criteria approach. \\
-        LHS & NA & None & Baseline comparison to pseudo-uniform sampling of parameter space. \\
+        Saf ei & Multi & EI version of SAF, as proposed in \cite{svenson2016multiobjective}. \\
+        Saf $\mu$ & Multi & Our proposed Optimiser. (See Alg. \ref{alg:ourAlg_pseudocde}) \\
+        SMS-EGO: ei & Multi & Current SOA \\
+        SMS-EGO: $\mu$ & Multi & Modification to current SOA to be more exploitative.\\
+        ParEgo & Mono & Efficient computation \\
+        MPoI & Multi & Benchmark for EMO over infill criteria approach. \\
+        LHS & None & Baseline comparison to pseudo-uniform sampling of parameter space. \\
         \hline
     \end{tabular}
 \end{table}
@@ -338,9 +518,9 @@ The WFG problems are intentionally constructed to cover significantly different 
     \caption{Objective functions to be assessed}\label{tab2}
     \begin{tabular}{|l|r|l|r|l|}
         \hline
-        Problem name &  Objectives & Domain & $d$ & Comment\\
+        Problem &  Obj. & Domain & $d$ & Comment\\
         \hline
-        WFG2 & 3 & $[0, 2d]^d$ & $5$ & multi-modal, discontinuous Pareto front, non-separatle\\
+        WFG2 & 3 & $[0, 2d]^d$ & $5$ & multi-modal, discontinuous Pareto front, non-separable\\
         WFG4 & 3 & $[0, 2d]^d$ & $5$ & multi-modal, separable\\
         WFG5 & 5 & $[0, 2d]^d$ & $5$ & separable, non-mixed parameters\\
         WFG6 & 2 & $[0, 2d]^d$ & $5$ & non-separable, non-mixed parameters\\
@@ -354,7 +534,7 @@ The WFG problems are intentionally constructed to cover significantly different 
 \end{table}
 
 
-\clearpage
+
 
 
 \section{Experimental evaluation}
@@ -419,11 +599,19 @@ The WFG problems are intentionally constructed to cover significantly different 
     \item MOOP vs MOP vs MOO<- pick one
     \item define HV
     \item state of the art vs state-of-the-art
+    \item check meaning of S-metric
 \end{itemize}
 
-\clearpage
-\bibliographystyle{splncs04}
+\begin{acks}
+The authors acknowledge ...
+\end{acks}
+
+
+
+
+
+\bibliographystyle{ACM-Reference-Format}
 \bibliography{bibliography}
 
 \end{document}
-jective
+\endinput

@@ -124,145 +124,73 @@ authorversion=false, % Whether to generate a special version for the authors’ 
 %% end of the preamble, start of the body of the document source.
 \begin{document}
 
-%%
-%% The "title" command has an optional parameter,
-%% allowing the author to define a "short title" to be used in page headers.
-\title{Greed is Good: Exploration and Exploitation Trade-offs in Bayesian Optimisation}
-      
-%%
-%% The "author" command and its associated commands are used to define
-%% the authors and their affiliations.
-\author{George {De Ath}}
-\email{g.de.ath@exeter.ac.uk}
-\orcid{0000-0003-4909-0257}
-\affiliation{%
-  \department{Department of Computer Science}
-  \institution{University of Exeter}
-  \city{Exeter}
-  \country{United Kingdom}
-}
+\section{Dominated Hypervolume measurement}
 
-\author{Richard M. Everson}
-\email{r.m.everson@exeter.ac.uk}
-\orcid{0000-0002-3964-1150}
-\affiliation{%
-  \department{Department of Computer Science}
-  \institution{University of Exeter}
-  \city{Exeter}
-  \country{United Kingdom}
-}
-
-\author{Alma A. M. Rahat}
-\email{a.a.m.rahat@swansea.ac.uk}
-\orcid{0000-0002-5023-1371}
-\affiliation{%
-  \department{Department of Computer Science}
-  \institution{Swansea University}
-  \city{Swansea}
-  \country{United Kingdom}
-}
-
-\author{Jonathan E. Fieldsend}
-\email{j.e.fieldsend@exeter.ac.uk}
-\orcid{0000-0002-0683-2583}
-\affiliation{%
-  \department{Department of Computer Science}
-  \institution{University of Exeter}
-  \city{Exeter}
-  \country{United Kingdom}
-}
-
-%%
-%% By default, the full list of authors will be used in the page
-%% headers. Often, this list is too long, and will overlap
-%% other information printed in the page headers. This command allows
-%% the author to define a more concise list
-%% of authors' names for this purpose.
-%\renewcommand{\shortauthors}{Trovato and Tobin, et al.}
-
-
-%%
-%% This command processes the author and affiliation and title
-%% information and builds the first part of the formatted document.
-\maketitle
-
-\section{Introduction}
-
-
-  \begin{table}[t]
-  \setlength{\tabcolsep}{2pt}
-  \sisetup{table-format=1.2e-1,table-number-alignment=center}
-  \resizebox{\textwidth}{!}{%
-  \begin{tabular}{l | SS| SS| SS| SS| SS}
-    \toprule
-    \bfseries Method
-    & \multicolumn{2}{c|}{\bfseries WangFreitas (1)} 
-    & \multicolumn{2}{c|}{\bfseries BraninForrester (2)} 
-    & \multicolumn{2}{c|}{\bfseries Branin (2)} 
-    & \multicolumn{2}{c|}{\bfseries Cosines (2)} 
-    & \multicolumn{2}{c}{\bfseries logGoldsteinPrice (2)} \\ 
-    & \multicolumn{1}{c}{Median} & \multicolumn{1}{c|}{MAD}
-    & \multicolumn{1}{c}{Median} & \multicolumn{1}{c|}{MAD}
-    & \multicolumn{1}{c}{Median} & \multicolumn{1}{c|}{MAD}
-    & \multicolumn{1}{c}{Median} & \multicolumn{1}{c|}{MAD}
-    & \multicolumn{1}{c}{Median} & \multicolumn{1}{c}{MAD}  \\ \midrule
-    LHS & 1.27e-02 & 1.80e-02 & 4.59e-01 & 4.73e-01 & 1.31e-01 & 1.33e-01 & 4.79e-01 & 2.71e-01 & 1.08e+00 & 7.69e-01 \\
-    Explore & 1.04e-02 & 1.42e-02 & 4.58e-01 & 3.52e-01 & 1.66e-01 & 1.56e-01 & 4.56e-01 & 2.20e-01 & 1.01e+00 & 5.50e-01 \\
-    EI & 2.00e+00 & 6.91e-11 & \statsimilar 2.47e-06 & \statsimilar 3.23e-06 & \statsimilar 4.15e-06 & \statsimilar 3.76e-06 & \statsimilar 6.31e-06 & \statsimilar 7.68e-06 & 2.73e-06 & 3.34e-06 \\
-    PI & 2.06e+00 & 8.24e-02 & 3.73e-04 & 3.70e-04 & 2.26e-05 & 3.22e-05 & \statsimilar 2.50e-03 & \statsimilar 3.18e-03 & 2.92e-03 & 4.32e-03 \\
-    UCB & 2.00e+00 & 1.26e-11 & \statsimilar 4.96e-06 & \statsimilar 6.22e-06 & \statsimilar 4.42e-06 & \statsimilar 4.06e-06 & \statsimilar 7.12e-06 & \statsimilar 8.86e-06 & 6.15e-06 & 6.17e-06 \\
-    PFRandom & \statsimilar 2.00e-04 & \statsimilar 2.96e-04 & 2.70e-03 & 3.65e-03 & 1.67e-03 & 2.17e-03 & \statsimilar 8.82e-03 & \statsimilar 1.14e-02 & 2.54e-03 & 3.31e-03 \\
-    \eRandom & \best 1.04e-06 & \best 1.54e-06 & \best 2.00e-06 & \best 2.49e-06 & \statsimilar 3.17e-06 & \statsimilar 2.46e-06 & 8.66e-06 & 1.21e-05 & 2.33e-06 & 2.36e-06 \\
-    \eFront & \statsimilar 2.00e+00 & \statsimilar 3.72e-11 & \statsimilar 2.31e-06 & \statsimilar 3.01e-06 & \statsimilar 3.57e-06 & \statsimilar 3.13e-06 & \best 2.02e-06 & \best 2.52e-06 & \best 8.76e-07 & \best 1.08e-06 \\
-    Exploit & 2.00e+00 & 6.00e-09 & 4.61e-06 & 6.04e-06 & \best 3.08e-06 & \best 3.29e-06 & 4.13e-01 & 6.12e-01 & 2.26e-06 & 2.90e-06 \\
-\bottomrule
-    \toprule
-    \bfseries Method
-    & \multicolumn{2}{c|}{\bfseries logSixHumpCamel (2)} 
-    & \multicolumn{2}{c|}{\bfseries logHartmann6 (6)} 
-    & \multicolumn{2}{c|}{\bfseries logGSobol (10)} 
-    & \multicolumn{2}{c|}{\bfseries logRosenbrock (10)} 
-    & \multicolumn{2}{c}{\bfseries logStyblinskiTang (10)} \\ 
-    & \multicolumn{1}{c}{Median} & \multicolumn{1}{c|}{MAD}
-    & \multicolumn{1}{c}{Median} & \multicolumn{1}{c|}{MAD}
-    & \multicolumn{1}{c}{Median} & \multicolumn{1}{c|}{MAD}
-    & \multicolumn{1}{c}{Median} & \multicolumn{1}{c|}{MAD}
-    & \multicolumn{1}{c}{Median} & \multicolumn{1}{c}{MAD}  \\ \midrule
-    LHS & 6.52e+00 & 1.10e+00 & 3.37e-01 & 1.10e-01 & 1.51e+01 & 9.03e-01 & 1.16e+01 & 5.39e-01 & 2.85e+00 & 1.77e-01 \\
-    Explore & 6.53e+00 & 1.24e+00 & 3.07e-01 & 6.85e-02 & 1.75e+01 & 1.42e+00 & 1.28e+01 & 4.82e-01 & 3.19e+00 & 1.13e-01 \\
-    EI & 7.42e-05 & 9.19e-05 & \statsimilar 1.06e-03 & \statsimilar 6.73e-04 & 7.15e+00 & 1.58e+00 & 6.62e+00 & 6.58e-01 & 2.34e+00 & 2.79e-01 \\
-    PI & 1.46e-01 & 1.58e-01 & \statsimilar 6.15e-04 & \statsimilar 7.69e-04 & 6.29e+00 & 1.61e+00 & 6.89e+00 & 9.49e-01 & 2.29e+00 & 2.37e-01 \\
-    UCB & 3.84e+00 & 1.36e+00 & 2.04e-01 & 3.21e-02 & 1.45e+01 & 6.16e-01 & 8.31e+00 & 5.90e-01 & 3.19e+00 & 1.13e-01 \\
-    PFRandom & 1.52e-01 & 1.52e-01 & 6.57e-02 & 3.27e-02 & 5.60e+00 & 1.73e+00 & 5.23e+00 & 4.98e-01 & 2.70e+00 & 3.15e-01 \\
-    \eRandom & \best 3.81e-05 & \best 2.96e-05 & \best 5.09e-04 & \best 3.59e-04 & \statsimilar 5.13e+00 & \statsimilar 2.86e+00 & \statsimilar 4.75e+00 & \statsimilar 7.85e-01 & \statsimilar 1.61e+00 & \statsimilar 3.12e-01 \\
-    \eFront & \statsimilar 4.06e-05 & \statsimilar 4.66e-05 & 7.71e-04 & 4.82e-04 & \best 5.06e+00 & \best 1.37e+00 & \statsimilar 4.64e+00 & \statsimilar 6.25e-01 & \best 1.53e+00 & \best 4.49e-01 \\
-    Exploit & \statsimilar 4.21e-05 & \statsimilar 4.95e-05 & \statsimilar 6.37e-04 & \statsimilar 5.82e-04 & \statsimilar 5.27e+00 & \statsimilar 1.60e+00 & \best 4.54e+00 & \best 6.19e-01 & 1.82e+00 & 3.71e-01 \\
-\bottomrule
-  \end{tabular}
-  }
-  \caption{Median absolute distance (\textit{left}) and median absolute deviation from the
-    median (MAD, \textit{right}) from the optimum after 250 function evaluations across 
-    the 51 runs. The method with the lowest median performance is shown
-    in dark grey, with those with statistically equivalent performance
-    are shown in light grey. }
-\label{tbl:synthetic_results}
-  \end{table}
-
-Table~\ref{tbl:synthetic_results} shows the median regret, \ie the median
-difference between the estimated optimum $\fstar$ and the true optimum %,
-over the 51 repeated experiments, together with the median
-absolute deviation from the median (MAD). The method with the lowest (best)
-median regret on each function is highlighted in dark grey, and those which are
-statistically equivalent to the best method according to a one-sided paired 
-Wilcoxon signed-rank test \citep{knowles:testing} with Holm-Bonferroni correction
-\citep{holm:test} ($p\geq0.05$), are shown in light grey.
-
-\begin{table}[t]
+\begin{table}[h]
 \setlength{\tabcolsep}{2pt}
 \sisetup{table-format=1.2e-1,table-number-alignment=center}
 \resizebox{\textwidth}{!}{%
 \import{tables/}{hv_table_1.tex}}
+\caption{Median Dominated Hypervolumes after 250 evaluations, for 31 repeated optimsaitons from randomised starting conditions. Best performance for each problem is highlighted in dark grey, and those which are
+statistically equivalent to the best method according to a one-sided paired Wilcoxon signed-rank test \citep{knowles:testing} with Holm-Bonferroni correction
+\citep{holm:test} ($p\geq0.05$), are shown in light grey.}
 \end{table}
+
+
+\begin{table}[h]
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\textwidth}{!}{%
+\import{tables/}{hv_table_2.tex}}
+\caption{Median Dominated Hypervolumes after 250 evaluations, for 31 repeated optimsaitons from randomised starting conditions. Best performance for each problem is highlighted in dark grey, and those which are
+statistically equivalent to the best method according to a one-sided paired Wilcoxon signed-rank test \citep{knowles:testing} with Holm-Bonferroni correction
+\citep{holm:test} ($p\geq0.05$), are shown in light grey.}
+\end{table}
+
+
+\begin{table}[h]
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\textwidth}{!}{%
+\import{tables/}{hv_table_3.tex}}
+\caption{Median Dominated Hypervolumes after 250 evaluations, for 31 repeated optimsaitons from randomised starting conditions. Best performance for each problem is highlighted in dark grey, and those which are
+statistically equivalent to the best method according to a one-sided paired Wilcoxon signed-rank test \citep{knowles:testing} with Holm-Bonferroni correction
+\citep{holm:test} ($p\geq0.05$), are shown in light grey.}
+\end{table}
+
+\clearpage
+\section{igd+ measurements}
+
+\begin{table}[h]
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\textwidth}{!}{%
+\import{tables/}{igd_table_1.tex}}
+\caption{some caption}
+\end{table}
+
+
+\begin{table}[h]
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\textwidth}{!}{%
+\import{tables/}{igd_table_2.tex}}
+\caption{some caption}
+\end{table}
+
+
+\begin{table}[h]
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\textwidth}{!}{%
+\import{tables/}{igd_table_3.tex}}
+\caption{some caption}
+\end{table}
+% Table~\ref{tbl:synthetic_results} shows the median regret, \ie the median
+%difference between the estimated optimum $\fstar$ and the true optimum %,
+%over the 51 repeated experiments, together with the median
+%absolute deviation from the median (MAD). The method with the lowest (best)
+
 
 \end{document}
 %%% Local Variables:

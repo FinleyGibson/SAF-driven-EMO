@@ -1,0 +1,105 @@
+\documentclass[
+dvipsnames, table,   % xcolor option
+format=acmsmall,     % paper format
+anonymous=true,      % Whether to make author(s) anonymous - used with review below to make anon
+authorversion=false, % Whether to generate a special version for the authors’ personal use or posting
+]{acmart}
+
+% author-year citation style (required by TELO)
+\citestyle{acmauthoryear}
+
+% algorithms
+\usepackage{algcompatible, algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{import}
+% spacing after full stops in \eg, \ie
+\usepackage{xspace}
+
+% subcaptions for side-by-side algorithms
+\usepackage[]{subcaption}
+\DeclareCaptionSubType*{algorithm}
+\renewcommand\thesubalgorithm{\thealgorithm\alph{subalgorithm}}
+
+% table and siunits
+\usepackage{tabularx, siunitx}
+
+
+
+% best technique and join best labels
+%\newcommand{\best}{\color{red}}
+%\newcommand{\statsimilar}{\color{blue}}
+\newcommand{\best}{{\cellcolor[gray]{0.75}}}
+\newcommand{\statsimilar}{{\cellcolor[gray]{0.9}}}
+
+
+\begin{document}
+
+\section{Dominated Hypervolume measurement}
+
+\begin{table}[h]
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\textwidth}{!}{%
+\import{tables/}{hv_table_1.tex}}
+\caption{}
+\end{table}
+
+%Median     Dominated Hypervolumes after 250 evaluations, for 31 repeated optimsaitons from randomised starting conditions. Best performance for each problem is highlighted in dark grey, and those which arestatistically equivalent to the best method according to a one-sided paired Wilcoxon signed-rank test \citep{knowles:testing} with Holm-Bonferroni correction \citep{holm:test} ($p\geq0.05$), are shown in light grey.
+
+\begin{table}[h]
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\textwidth}{!}{%
+\import{tables/}{hv_table_2.tex}}
+\caption{}
+\end{table}
+
+
+\begin{table}[h]
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\textwidth}{!}{%
+\import{tables/}{hv_table_3.tex}}
+\caption{}
+\end{table}
+
+\clearpage
+\section{igd+ measurements}
+
+\begin{table}[h]
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\textwidth}{!}{%
+\import{tables/}{igd_table_1.tex}}
+\caption{}
+\end{table}
+
+
+\begin{table}[h]
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\textwidth}{!}{%
+\import{tables/}{igd_table_2.tex}}
+\caption{}
+\end{table}
+
+
+\begin{table}[h]
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\textwidth}{!}{%
+\import{tables/}{igd_table_3.tex}}
+\caption{}
+\end{table}
+% Table~\ref{tbl:synthetic_results} shows the median regret, \ie the median
+%difference between the estimated optimum $\fstar$ and the true optimum %,
+%over the 51 repeated experiments, together with the median
+%absolute deviation from the median (MAD). The method with the lowest (best)
+
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% auto-fill-mode: t
+%%% End:

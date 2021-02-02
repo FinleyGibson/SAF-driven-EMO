@@ -50,8 +50,10 @@
 \usetikzlibrary{shadows.blur}
 \usepackage{booktabs} % For formal tables
 \usepackage{graphicx}
+\usepackage{mathtools}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{xspace}
 \captionsetup{compatibility=false}
 \usepackage[ruled,vlined, linesnumbered]{algorithm2e}
 \newcommand{\algremark}[1]{\tcc*[r]{#1}}
@@ -65,8 +67,9 @@
 
 %% MATHS COMMANDS
 % for algorithms
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
 \DeclareMathOperator*{\sig}{sig}
-\DeclareMathOperator*{\SAF}{SAF}
+\DeclareMathOperator*{\msaf}{SAF}
 \DeclareMathOperator*{\OSAF}{osaf}
 \DeclareMathOperator*{\DSAF}{dsaf}
 \DeclareMathOperator*{\MMIN}{maximin}
@@ -77,7 +80,19 @@
 \def\BState{\State\hskip-\ALG@thistlm}
 \makeatother
 
-\newcommand{\MSAF}{SAF-$\mu$}
+\newcommand\saf{SAF$_{\mu}$\xspace}
+\newcommand\safmu{SAF$_{\mu}$\xspace}
+\newcommand\safei{SAF$_{EI}$\xspace}
+\newcommand\smsego{SMS-EGO\xspace}
+\newcommand\smsegomu{SMS-EGO$_{\mu}$\xspace}
+\newcommand\parego{ParEGO\xspace}
+\newcommand\mpoi{MPoI\xspace}
+\newcommand\EI{EI\xspace}
+\newcommand\GP{GP\xspace}
+\newcommand\minimax{minimax\xspace}
+\newcommand\lhs{LHS\xspace}
+\newcommand\igd{IGD$+$\xspace}
+
 \newcommand\target{\mathcal{T}}
 \newcommand\mF{\mathcal{F}}
 \newcommand\mP{\mathcal{P}}
@@ -104,6 +119,14 @@
 
 \newcommand{\trp}{^\top}
 \newcommand{\given}{\,|\,}
+
+
+
+\DeclareMathOperator*{\migd}{IGD^{+}}
+
+\newcommand{\pigdref}{\mathcal{A}}
+\newcommand{\pattainment}{\mathcal{V}}
+\newcommand{\mref}{\mathbf{R}}
 \newcommand{\bx}{\mathbf{x}}
 \newcommand{\bX}{\mathbf{X}}
 \newcommand{\by}{\mathbf{y}}
@@ -328,7 +351,7 @@ _desc>
 \section{Introduction}
 The process of optimising black-box functions relies exclusively on querying the underlying objective function in order to advance the understanding of the parameter objective-space mapping of, and converge toward, an optimal solution. During the optimisation process a balance must be struck between the exploitation of the function as currently understood, in order to find good solutions, and further exploration of the unknown regions of its landscape in order to advance this understanding. Extensive work has gone into theorising how this balance should be managed, particularly in cases where there is a high cost associated with querying the underlying objective. In such cases careful management of this balance is essential if a suitable solution is to be found as efficiently as possible. Bayesian optimisation\cite{jones1998efficient} has emerged as an effective means of solving such problems, and has been widely applied to many problems with success.
 
-In the field of multi-objective optimisation (MOO), efforts have been made to employ similar strategies to those used for single objective optimisation, but accurately modelling the multi-dimensional objective space is more challenging, and many techniques used in single-objective optimisation require complex volume measurement and integration which scale poorly in the higher dimensional objective spaces associated with multi-objective problems (MOPs). One widely used technique is the computation of the expected improvement (EI) to manage the exploitation/exploration trade-off. However, recent work has shown that in single objective problems with high-dimensional parameter spaces, the low fidelity between the commonly used surrogate models and the underlying function reduces the need to actively explore the function. Instead purely exploitative methods have been demonstrated to outperform methods which balance the explore/exploit trade-off, when the fidelity between the surrogate and true function is low \cite{death2020greed}. With this in mind we look apply to this exploitative approach to the multi-objective domain, where we believe the increased complexity of modelling problems with multi-dimensional outputs will enjoy similar benefits of an exploitative approach. 
+In the field of multi-objective optimisation (MOO), efforts have been made to employ similar strategies to those used for single objective optimisation, but accurately modelling the multi-dimensional objective space is more challenging, and many techniques used in single-objective optimisation require complex volume measurement and integration which scale poorly in the higher dimensional objective spaces associated with multi-objective problems (MOPs). One widely used technique is the computation of the expected improvement (EI) to manage the exploitation/exploration trade-off. However, recent work has shown that in single objective problems with high-dimensional parameter spaces, the low fidelity between the commonly used surrogate models and the underlying function reduces the need to actively explore the function. Instead purely exploitative methods have been demonstrated to outperform methods which balance the explore/exploit trade-off, when the fidelity between the surrogate and true function is low \cite{death2019greed}. With this in mind we look apply to this exploitative approach to the multi-objective domain, where we believe the increased complexity of modelling problems with multi-dimensional outputs will enjoy similar benefits of an exploitative approach. 
 
 In this paper we address a particular set of MOPs, for which some cost associated with the evaluation of the objectives for a set of parameters is significant, and restricts the number of queries of the objective function can be made. This can be because either each objective is independently expensive and requires a separate evaluation or, more commonly, all objectives are jointly evaluated by a single expensive process. In such MOPs the goal of the optimisation process is to find a suitable solution in as few evaluations of the objective as possible. The advent of large-scale simulation, and optimisation problems that require physical experimentation to evaluate the objective has brought this class of Efficeint MOPs (EMOPs) to the fore as an important area of research. This class of problem is common in real-world applications, particularly in the fields of engineering and computer modelling. For example, when engineering a component based on some design parameters, performance evaluation of a newly proposed design may require making and testing the component, incurring both time and material costs \cite{fang2017design}. Alternately, computationally expensive processes such as fluid dynamic simulation or machine learning model evaluation, often have high computational costs associated with them and can take hours or even days to process \cite{huband2005scalable}. This renders optimiser classes such as Multi-Objective Evolutionary Algorithms (MOEAs) \cite{tanabe2017benchmarking,coello2007evolutionary} or Multi-Objective Genetic Algorithms (MOGAs) \cite{tamaki1996multi}, for which a large number of objective evaluations are required, unsuitable. 
 
@@ -436,7 +459,7 @@ Practical experience shows that multi-surrogate methods tend to be superior to m
 Acquisition functions are more complex in MOPs than in single objective Bayesian optimisation, as the acquisition function must additionally combine the vector of surrogate predictions for each objective into a scalar value. Generalisations of EI and PI to MOPs have been made by deploying mono-surrogates to jointly model the parameter space/objective space mapping, and then multi-dimensional integration applied to calculate the probability density function for a given set of parameters \cite{emmerich2006single,keane2006statistical}. The disadvantage of this is that multi-dimensional integration is computationally expensive and quickly becomes impractical due to the \textit{curse of dimensionality} associated with the dimensional increase resulting from the inclusion of additional objectives. More generally the acquisition function involves a function to interpolate between the explored points in the objective space, and then posterior predictions from the surrogate/surrogates are evaluated against this in order to quantify their suitability as candidates. 
 
 
-\section{Exploitative SAF (\MSAF)}\label{section:our_method}
+\section{Exploitative (\safmu)}\label{section:our_method}
 \begin{itemize}
     \item What is it? Infill criteria based on minimax distance, using the mean prediction of the gp. 
     \item why? 
@@ -455,7 +478,7 @@ Acquisition functions are more complex in MOPs than in single objective Bayesian
     \end{itemize}
 \end{itemize}
 
-In our proposed \MSAF  method, the expected maximin fitness improvement function proposed by Svenson \citep{svenson2016multiobjective} is adapted to an infill criterion calculated as the signed maximin distance, centred at zero, from the summary attainment front. 
+In our proposed \safmu  method, the expected maximin fitness improvement function proposed by Svenson \citep{svenson2016multiobjective} is adapted to an infill criterion calculated as the signed maximin distance, centred at zero, from the summary attainment front. 
 
 We propose combining several components discussed in section \ref{section:related_work}, which have independently demonstrated advantages in efficient optimisation, be it in the domain of single or multi-objective optimisaiont. We propose a Bayesian approach to optimisation using GPs to model the objective function, and using the inexpensive and dominance preserving maximin function described in \cite{svenson2016multiobjective}, but forgoing the popular EI computation in favour of a more exploitative approach as explored in \cite{death2019greed}. To achieve this we will use the surrogate assisted EMO strategy with GP surrogates, as proposed by Emmerich \cite{emmerich2006single} using a multi-surrogate GP model, but using only the mean prediction of the surrogates when making predictions about new parameters, in order to emphasise exploitation, and hope that the complexity of MOPs will produce sufficient fortuitous exploration, without the need to actively pursue it. We propose combining the surrogate predictions of such maximia through an acquisition function which uses the maximin distance from the non-dominated observations. Pseudo-code for our proposed algorithm can be seen in Algorithm \ref{alg:ourAlg_pseudocde}.
 
@@ -486,7 +509,7 @@ We propose combining several components discussed in section \ref{section:relate
     }
     $\mathcal{P} \gets \data$ \algremark{Select non-dominated evaluations according to \eqref{eqn: Pareto_set}}
     $\bx' \gets \underset{\mathbf{x}\in \Omega}{\argmax} \:
-    \SAF(\mathbf{x}, \mathcal{P}, \theta_{1:D})$ \label{alg:opt-alpha_DSAF} \algremark{Find $\bx$ which maximises $\SAF$}
+    \msaf(\mathbf{x}, \mathcal{P}, \theta_{1:D})$ \label{alg:opt-alpha_DSAF} \algremark{Find $\bx$ which maximises $\msaf$}
     $ \bff' \gets \bff(\bx')$ \label{alg:expensive_DSAF} \algremark{Expensively evaluate $\bx'$}
     $\data  \gets \data \cup \{(\bx', \bff' )\}$\algremark{Augment data}
  }
@@ -513,27 +536,90 @@ In single-objective Bayesian optimisation, it has recently been suggested that e
 
 
 \section{Experimental evaluation}
+In this section an analysis is conducted of the performance of \safmu over 150 evaluations of a set of challenging, synthetic MOPS. For comparison we also benchmark the performance against the state-of-the art \smsego \citep{ponweiser2008multiobjective} and the computationally efficient \parego \citep{knowles2006parego} and \mpoi as the infill criteria method suggested by Rahat \etal \citep{rahat2017alternative}. For \smsego we include the later improvements to the treatment of the objective space dominated by the attainment surface described by Wagner \etal \citep{wagner2010expected}, and the prior knowledge of the objective space required to set the reference point for the hypervolume calculation is assumed to be unknown. Instead the reference point is updated at each evaluation to the maximum value observed in each objective by the points in the current attainment surface multiplied by a factor of $1.5$. $\mref \gets \max(\pattainment)$. In order to test the second part of our hypothesis, that more explitative search will be beneficial, we also include the \EI based \minimax model proposed by Svenson \citep{svenson2016multiobjective}, (hereby denoted as \safei), and also a version of \smsego, where the uncertainty from the \GP is ignored, instead using mean prediction only, with no correction for $\epsilon$ (denoted \smsegomu.  
+
+Each optimisation is started from 10 initial \lhs samples, over 31 repeat optimisations of each problem. The repeats are structured so that the same random seed and \lhs samples are used for all optimisation methods within each repeat, and the surrogate used in each of the surrogate methods is an identical \GP applied to the data normalised at each step to have $\mu=0$, $\sigma=1$. Where required the dominated hypevolume is calculated using the Fonseca hypervolume method \citep{fonseca2006improved}.
+
+% \begin{itemize}
+    % \item HOW CONDUCTED
+    % \item analysis of performance on complex set of problems
+    % \item to test two parts of hypothesis we test both mu and ei for saf and sms. And we compare to state of the art, efficient (Parego) and SOA SMS ego. AS well as MPOI method which has been shown to outperform other cheap infills (true?) 
+    % \item over budget of 250 evaluations
+    % \item 31 repeats of each optimiser
+    % \item starting from 10 LHS samples
+    % \item paired evaluations
+    % \item where required hypervolumes calculated using Fonseca,
+    % \item reference points selected from the maximum observed attainment front*1.5
+    % \item GPs fitted to data scaled to std 1, mean 0. 
+% \end{itemize}
+
+The chosen objective functions on which to benchmark the different strategies are a subset the Walking Fish Group problems \citep{huband2005scalable} WFG1-WFG6, designed to build on the well-known DTLZ problem set \citep{deb2005scalable} by including deceptive functions and functions where the parameters dictating distance from, and position along the Pareto front are not separable. The dimensionality of the parameter-space $d$ for the WFG problems is scalable, as are the number of objectives $M$. We tested each function over three copnfigurations of each problem in WFG1-WFG6, with 2, 3 and 4 objectives, and parameter spaces ranging from 6-12 dimensions. The exception to this is WFG2, which was poorly optimised by all optimiser, and so had the parameter space reduced to the minimum permissable $d=[3, 4, 5]$ to aid convergence. A full table of the test functions can be seen in Table \ref{tab: f_table}.
+
+
+\begin{table}[t]
+    \setlength{\tabcolsep}{2pt}
+    \sisetup{table-format=1.2e-1,table-number-alignment=center}
+    \resizebox{0.5\textwidth}{!}{%
+        \begin{tabular}{|l|r|l|r|l|}
+            \hline
+            Function &  $M$ & Domain & $d$ & Comment\\
+            \hline
+            WFG1 & 2, 3, 4 & $[0, 2d]^d$ & $3, 4, 5$ &  separable, uni-modal \\
+            WFG2 & 2, 3, 4 & $[0, 2d]^d$ & $6, 6, 10$ & non-separable, multi-modal\footnotemark{}, discontinuous Pareto front \\
+            WFG3 & 2, 3, 4 & $[0, 2d]^d$ & $6, 10, 10$ &  non-separable, uni-modal \\
+            WFG4 & 2, 3, 4 & $[0, 2d]^d$ & $6, 8, 8$ & separable, multi-modal\\
+            WFG5 & 2, 3, 4 & $[0, 2d]^d$ & $6, 8, 10$ & separable, deceptive\\
+            WFG6 & 2, 3, 4 & $[0, 2d]^d$ & $10, 6, 12$ & non-separable, uni-modal\\
+            \hline
+        \end{tabular}}
+        \caption{Objective functions to be assessed}\label{tab: f_table}
+\end{table}
+\footnotetext{multi-modal in only the first objective, uni-modal in $M>1$}
+
+Two metrics are used to quantify the performance of each optimiser. The first is the dominated hypervolume (or $\mathcal{S}$-metric). This is a commonly used means of measuring convergence toward the Pareto front, but as it is also the driving force behind \smsego. As such we also compare measuremnets of the Inverted Generational Distance plus (\igd) \citep{ishibuchi2015modified}, calculated as:
+\begin{equation}
+    \migd(\pigdref, \pattainment) = \frac{1}{\abs{\pattainment}}\Bigg(
+    \sum_{j=1}^{\abs{\pattainment}} d^{+}(\mathbf{z}_j, \mathbf{a})^{p}
+    \Bigg)^{\frac{1}{p}}
+\end{equation}
+where $d_j$ is the nearest modified Euclidean distance drom $\mathbf{z}_j \in \pattainment$ to $\pigdref$, and $d^{+}$ is given by:
+\begin{equation}
+    d^+(\mathbf{z}, \mathbf{a}) = \sqrt{(\max\{a_1-z_1, 0\}+\cdots+\max\{a_m-z_m, 0\})}
+\end{equation}
+Measurements using \igd rely on a set of reference points $\pigdref$ on the problem's Pareto surface. In order to ensure no bias toward solutions found in localised regions of this surface it is important that the points be distributed evenly, which is not guaranteed once random samples have been mapped to the Pareto surface with the \textit{Shape Functions} described in the WFG function definitions. In order to achieve an even distribution, this we first sample an uneven, but dense population of points on this Pareto surface, and then calculate a set of evenly distributed points on the attainment surface generated using the methods described by Smith \etal \citep{smith2004dominance}. Attainment surface points which do not lie on the Pareto surface, were then discarded if their nearest neighbour in the set of Pareto optimal points, was greater than a certain threshold. This sampling method was used for all functions with the exception of WFG3, for which the Pareto surface is trivial to compute and sample evenly, and the reference points for the ellipsoidal WFG4 are shown in fig XXX.  
+\begin{itemize}
+    \item HOW ASSESSED
+    % \item which problems chosen?
+    % \item why problems chosen? build on DTLZ, include various features (multimodal, convex, separable). 
+    % \item why d6? reduced dimensionality for wfg1 to facilitate finding better solutions
+    % \item measurements taken using dominated hypervolume and igd+
+    % \item igd+ samples taken by oversampling the pareto front, and then drawing a random sample from this using the attainment sampling techinique described in richards paper. 
+    % \item results compared by their median value, with statistical equivlance tested using Holm-bonferoni corrected wilcoxen signed rank test. 
+    \item problem table
+\end{itemize}
 
 \begin{itemize}
-    \item analysis of performance on complex set of problems
-    \item to test two parts of hypothesis we test both mu and ei for saf and sms. And we compare to state of the art, efficient (Parego) and SOA SMS ego. AS well as MPOI method which has been shown to outperform other cheap infills (true?) 
-    \item over budget of 250 evaluations
-    \item 31 repeats of each optimiser
-    \item starting from 10 LHS samples
-    \item paired evaluations
-    \item where required hypervolumes calculated using Fonseca,
-    \item reference points selected from the maximum observed attainment front*1.5
-    \item GPs fitted to data scaled to std 1, mean 0. 
-    \item why problems chosen? build on DTLZ, include various features (multimodal, convex, separable). 
-    \item why d6? reduced dimensionality for wfg1 to facilitate finding better solutiuons
-    measurements taken using dominated hypervolume and igd+
-    \item igd+ samples taken by oversampling the pareto front, adn then drawing a random sample from this using the attianment samlping techinique described in richards paper. 
-    \item results compared by their median value, with statistical equivlance testedl using Holm-bonferoni corrrected wilcoxen signed rank test. 
+    \item OVERALL
+    \item As expected performance was problem-specific
+    \item over the full 150 evaluations SAF-MU was the best performer or equivalent on 7 problems. The same as Sms EI. SMS-Mu was best with 9.
+    \item For IGD+, saf-mu best on 9. SMS EI best on 8. SMS-MU also best on 9.
+    \item this only considers a snapshot of the optimisation process when the optimiser have largely converged. The ranked order can be seen in fig X. "ranks adjusted for equivalence". 
+    \item WFG1 and 2 converged poorly by infill criteria methods
+    \item WFG2 converged poorly by all methods
     
-    \item hypothesis one: SAF just as good
-        \begin{ite}
-            \item Saf better than SE
-        \end{ite}
+\end{itemize}
+\begin{itemize}
+        \item HYPOTHESIS ONE: SAF JUST AS GOOD
+        \item Optimisations where saf beats sms, visa versa
+        \item neith
+\end{itemize}
+\begin{itemize}
+        \item HYPOTHESIS TWO: greedy > ei 
+        \item According to the summed rank. SMS-Mu was best thorough out on both hypervolume and IGD+. Though SAF-Mu competitive in the early stages(up to 60 evaluations), pulls away in the later stages,mbut SAF-Mu and the current SOA SMS-EGO remain competitive. 
+    \item Greedy vs EI
+        \item For HPV after the full 150 evaluations saf-ei median only better on one opt (WFG4 3obj 8dim) than saf mu, in which they were statistically equivalent
+        
+    \item all infil criteria optimisers performed poorly on WFG2. This is the only test problem where the manifold on which the pareto front lies, extends into the hypervolume dominated by the Parto front. On this problem ParEgo is cosistently the best performer and several infil criterion based optimsers are beaten by pure LHS sampling.
     
 \end{itemize}
 In this section we compare the approach proposed in section \ref{section:our_method} to several others on the well-known Walking Fish Group (WFG) problem set \cite{huband2005scalable}. We measure the performance of the algorithms according to the dominated hypervolume (DHV), and the inverted generational distance plus (IGD+).
@@ -565,68 +651,7 @@ The algorithms to be compared are laid out in table \ref{table:alg_table} below.
 
 The WFG problems are intentionally constructed to cover significantly different numerical ranges in the domains of each of their objectives. This presents a problem to the DHV measurement, as the computation of the HV depends onheavily on the scales of the objectives. A common solution to this is to optimise a scaled version of the WFG problems where the ranges of each dimension have been normalised, and to set the reference point for the DHV measurement within this scaled objective space, equidistant from the origin \cite{}. To do this is to assume prior knowledge about the objective function, information which is not typically available in real-world problems. SMS-EGO uses the dominated hypervolume measurement in its process of assessing candidate solutions, and to scale the objectives a priori and provide an ideally positioned reference point is not realistic in a real application. Furthermore setting the DHV reference point for SMS-EGO identically to that against which it is assessed will inevitably give SMS-EGO an unfair advantage, when assessed by the DHV criterion. Instead we will require SMS-EGO to set its own reference point and scale the objectives accordingly. This will be done dynamically during the optimisation in order to normalise the range of each objective present in the non-dominated set of observations. 
 
-\begin{table}[t]
-    \setlength{\tabcolsep}{2pt}
-    \sisetup{table-format=1.2e-1,table-number-alignment=center}
-    \resizebox{0.5\textwidth}{!}{%
-        \begin{tabular}{|l|r|l|r|l|}
-            \hline
-            Test function &  Obj. & Domain & $d$ & Comment\\
-            \hline
-            WFG1 & 2, 3, 4 & $[0, 2d]^d$ & $5$ &  XXX \\
-            WFG2 & 2, 3, 4 & $[0, 2d]^d$ & $5$ & multi-modal, discontinuous Pareto front, non-separable\\
-            WFG3 & 2, 3, 4 & $[0, 2d]^d$ & $5$ &  XXX \\
-            WFG4 & 2, 3, 4 & $[0, 2d]^d$ & $5$ & multi-modal, separable\\
-            WFG5 & 2, 3, 4 & $[0, 2d]^d$ & $5$ & separable, non-mixed parameters\\
-            WFG6 & 2, 3, 4 & $[0, 2d]^d$ & $5$ & non-separable, non-mixed parameters\\
-            \hline
-        \end{tabular}}
-        \caption{Objective functions to be assessed}\label{tab2}
-\end{table}
 
-
-
-
-
-\section{Experimental evaluation}
-\begin{enumerate}
-    \item describe algorithms to be compared
-    \item describe test functions, and why they were chosen.:
-        
-
-\item Describe assessment criterion (hypervolume/igd+)
-\item show results comparing SAF-mean, SAF-greed, Sms-Ego, ParEgo, Mpoi, Lhs.
-\end{enumerate}
-
-\section{Discussion}
-\begin{enumerate}
-    \item, \MSAF, SMSEGO and SMS-EGO-mu potentially resample already chosen points
-    \item Discuss results showing SAF-mean comparable with Sms-Ego
-    \item Discuss SAF-ei poor performance
-    \item Compare objective space images and suggest potential reasons for poor SAF-ei:
-        \begin{itemize}
-            \item \textbf{Theorem 1} Surface behind Pareto front in objective space as key reason. (Paper improving SmsEgo clearly thinks this region is significant).  
-            \item \textbf{Theorem 2} Over optimism in model allows probability distribution to stray into unattainable region of objective space. High dimensionality of parameter/objective space causes high model uncertainty exacerbating this issue. 
-        \end{itemize}
-\end{enumerate}
-
-\subsection{Investigation into Theorems}
-\begin{enumerate}
-    \item Show hybrid algorithm performance.
-    \begin{itemize}
-        \item SAF-mean behind Pareto front / SAF-ei beyond. Exploration/Exploitation is still based on SAF-ei, but the flat area is removed and replaced with something we know works well.
-        \item SmsEgo behind Pareto front / SAF-mean beyond. 
-        \item SAF-mean behind Pareto front / SmsEgo beyond. 
-    \end{itemize}
-    \item Compare all algorithms with and without ei. 
-    \item Discuss findings:
-        \begin{itemize}
-            \item SAF-ei not improved by substituting known efficient method behind front.
-            \item All combinations of SmsEgo and Saf-mean work similarly well, suggesting the problem lies within the expected improvement. 
-            \item Algorithms improved by not using ei
-            \item Offer further evidence in objective space plots of optimisation. Show boundary interactions, show Monte-carlo sample point clouds. 
-        \end{itemize}
-\end{enumerate}
 
 \subsection{Conclusion}
 \begin{enumerate}

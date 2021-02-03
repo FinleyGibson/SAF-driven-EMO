@@ -26,7 +26,7 @@
 
 
 
-\documentclass[sigconf,margin=15mm]{acmart}
+\documentclass[sigconf,margin=15mm, dvipsnames, table]{acmart}
 
 \usepackage{booktabs,multirow,array,caption,hhline}
 \newcolumntype{N}{@{}m{0pt}@{}}
@@ -56,7 +56,18 @@
 \usepackage{xspace}
 \captionsetup{compatibility=false}
 \usepackage[ruled,vlined, linesnumbered]{algorithm2e}
+\usepackage{import}
+
+% table and siunits
+\usepackage{tabularx, siunitx}
+
+% best technique and join best labels
+%\newcommand{\best}{\color{red}}
+%\newcommand{\statsimilar}{\color{blue}}
+\newcommand{\best}{{\cellcolor[gray]{0.75}}}
+\newcommand{\statsimilar}{{\cellcolor[gray]{0.9}}}
 \newcommand{\algremark}[1]{\tcc*[r]{#1}}
+
 % Used for displaying a sample figure. If possible, figure files should
 % be included in EPS format.
 %
@@ -589,7 +600,7 @@ where $d_j$ is the nearest modified Euclidean distance drom $\mathbf{z}_j \in \p
 \end{equation}
 Measurements using \igd rely on a set of reference points $\pigdref$ on the problem's Pareto surface. In order to ensure no bias toward solutions found in localised regions of this surface it is important that the points be distributed evenly, which is not guaranteed once random samples have been mapped to the Pareto surface with the \textit{Shape Functions} described in the WFG function definitions. In order to achieve an even distribution, this we first sample an uneven, but dense population of points on this Pareto surface, and then calculate a set of evenly distributed points on the attainment surface generated using the methods described by Smith \etal \citep{smith2004dominance}. Attainment surface points which do not lie on the Pareto surface, were then discarded if their nearest neighbour in the set of Pareto optimal points, was greater than a certain threshold. This sampling method was used for all functions with the exception of WFG3, for which the Pareto surface is trivial to compute and sample evenly, and the reference points for the ellipsoidal WFG4 are shown in Figure \ref{fig: refpoints_wfg4}.  
 
-\begin{figure}[h]
+\begin{figure}[t]
 \includegraphics[width=\columnwidth]{figures/_IGD_refpoint_example_WFG4.pdf}
 \caption{\igd reference points, for 3 objective WFG4.}
 \label{fig: refpoints_wfg4}
@@ -608,7 +619,52 @@ Measurements using \igd rely on a set of reference points $\pigdref$ on the prob
 
 \subsection{Findings}
 
- 
+\begin{table}[h]
+
+\begin{subtable}[b]{\columnwidth}
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\columnwidth}{!}{%
+\import{tables/}{hv_table_1.tex}}
+\end{subtable}
+
+\begin{subtable}[b]{\columnwidth}
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\columnwidth}{!}{%
+\import{tables/}{hv_table_2.tex}}
+\end{subtable}
+
+\begin{subtable}[b]{\columnwidth}
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\columnwidth}{!}{%
+\import{tables/}{hv_table_3.tex}}
+\end{subtable}
+
+\caption{}
+\end{table}
+
+
+
+\begin{figure}[t]
+\begin{subfigure}[b]{\columnwidth}
+         \centering
+         \includegraphics[width=\columnwidth]{figures/_ranked_performance_plot_hv.pdf}
+        %  \caption{}
+        %  \label{fig: ranked_hv_plot}
+     \end{subfigure}
+\begin{subfigure}[b]{\columnwidth}
+         \centering
+         \includegraphics[width=\columnwidth]{figures/_ranked_performance_plot_igd.pdf}
+        %  \caption{}
+        %  \label{fig: ranked_igf_plot}
+     \end{subfigure}
+\caption{ranks}
+\label{fig: ranked_plots}
+\end{figure}
+
+
 \begin{itemize}
     \item OVERALL
     \item As expected performance was problem-specific

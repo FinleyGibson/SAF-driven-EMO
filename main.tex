@@ -437,7 +437,7 @@ would be at a new location is achieved through application of an acquisition fun
 \begin{equation}\label{eqn: argmax_alpha}
    \bx' = \underset{\mathbf{x} \in \Omega}{\argmax}\:\alpha(\mathbf{x};  \theta).
 \end{equation}
-The acquisition function can be cheaply optimised using methods such as an EAs/GAs without the need for repeated evaluation of the expensive objective function. Several broadly applicable acquisition functions have been specified, typically based on expected improvement or probability of improvement (PI) measures \cite{jones1998efficient,shahriari2015taking} and \EI has been shown to converge at a near optimal rate \cite{bull2011convergence}. This process of fitting a surrogate, and optimisation of the acquisition function is repeated,  to expand $\mathcal{D}$, iteratively until a good solution is found and some stopping criteria is satisfied or the computational budget is exhausted.
+The acquisition function can be cheaply optimised using methods such as an evolutionary algorithm (EA) without the need for repeated evaluation of the expensive objective function. Several broadly applicable acquisition functions have been specified, typically based on expected improvement or probability of improvement (PI) measures \cite{jones1998efficient,shahriari2015taking} and \EI has been shown to converge at a near optimal rate \cite{bull2011convergence}. This process of fitting a surrogate, and optimisation of the acquisition function is repeated,  to expand $\mathcal{D}$, iteratively until a good solution is found and some stopping criteria is satisfied or the computational budget is exhausted.
 
 \subsection{Multi-objective Bayesian Optimisation}\label{section:background_MOPs}
 In MOPs there is not one single criterion by which the success of a solution is assessed, but rather a series of conflicting objectives, between which some compromise must be reached. We denote the $D$ conflicting objective functions by $f_i(\bx)$, $i = 1, \ldots, D$, so that the MOP may be expressed 
@@ -450,9 +450,10 @@ where $\Omega \subset \mathbb{R}^n$ is the feasible space and and $\mathbf{f}: \
 A solution $\bx$ is said to dominate another $\bx'$ (denoted $\bx \prec \bx'$) if $f_i(\bx) \le f_i(\bx')$ for $i = 1, \ldots, D$ and $ f_i(\bx) < f_i(\bx')$ for at least one $i$. Since in most cases with conflicting objectives there is no single dominating solution, the goal of most multi-objective optimisation algorithms is to produce a number of solutions which well represent the Pareto set, that is the maximal set of solutions that are not dominated by any other solutions in the feasible space:
 \begin{equation}\label{eqn: Pareto_set}
   \mathcal{P} = \{\mathbf{x} \in \Omega \;:\;
-  \bx' \not\prec \bx \,\forall \bx' \in \Omega \}
+  \bx' \not\prec \bx \,\forall \bx' \in \Omega \}.
 \end{equation}
-This is referred to as the summary attainment front (SAF), and the image of $\mP$ under $\bff$ is the Pareto front.
+%This is referred to as the summary attainment front (SAF),\mnote{no it is not -- you are confusing spaces and constructs here} and t
+The image of $\mP$ under $\bff$ is the Pareto front. Typically in multi-objective optimisation the best we can aspire to is an \emph{approximation} this, as represented by a set of mutually non-dominating solutions. The line/surface in objective space which separates the area/volume dominated by any element of this set from that which is non-dominated is known as the summary attainment front (SAF).
 
 Multi-objective Bayesian optimisation is the extension of the process described in secion \ref{section:background_BayesianOptimisation} to the multi-objective setting in \ref{section:background_MOPs}. Methods of Bayesian optimisation for MOPs generally fall into one of two categories: single surrogate approaches and multi-surrogate approaches. In a multi-surrogate approach, each objective $f_i$ is modelled individually by its own separate surrogate $g_i(\bx)$. These models are usually considered to be independent, thus ignoring
 cross-correlations between the models and resulting in $D$, mono-variate probability density functions. An acquisition function is then used to combine these distributions into a scalar quality measure:
@@ -461,18 +462,18 @@ cross-correlations between the models and resulting in $D$, mono-variate probabi
 \end{equation}
 where $\theta_i$ denotes the parameters of the trained surrogate model of $f_i(\bx)$, and $g_i \mapsto \mathbb{R}$. In single surrogate models the $D$ objective functions are jointly modelled by a single function $g(\bx) \sim \bff(\bx)$, such that $g \mapsto \mathbb{R}^D$, and the $D$ dimensional vector $ \mathbf{g} \gets g(\bx)$ is combined into a scalar value by the acquisition function which is subsequently maximised to find the next location for expensive evaluation.
 \begin{equation}\label{eqn: eqn: max_alpha_monosurrogate}
-   \bx' = \underset{\mathbf{x}\in \Omega}{\argmax}\:\alpha(\mathbf{x}; \theta)
+   \bx' = \underset{\mathbf{x}\in \Omega}{\argmax}\:\alpha(\mathbf{x}; \theta).
 \end{equation}
 Practical experience shows that multi-surrogate methods tend to be superior to mono-surrogate approaches because a single GP is unable to effectively model the highly complex function formed by the aggregated objectives, whereas each of the GPs in a multi-surrogate approach has the simpler task of modelling a single objective function \cite{rahat2017alternative}. 
 
-Acquisition functions are more complex in MOPs than in single objective Bayesian optimisation, as the acquisition function must additionally combine the vector of surrogate predictions for each objective into a scalar value. Generalisations of \EI and PI to MOPs have been made by deploying mono-surrogates to jointly model the parameter space/objective space mapping, and then multi-dimensional integration applied to calculate the probability density function for a given set of parameters \cite{emmerich2006single,keane2006statistical}. The disadvantage of this is that multi-dimensional integration is computationally expensive and quickly becomes impractical due to the \textit{curse of dimensionality} associated with the dimensional increase resulting from the inclusion of additional objectives. More generally the acquisition function involves a function to interpolate between the explored points in the objective space, and then posterior predictions from the surrogate/surrogates are evaluated against this in order to quantify their suitability as candidates. 
+Acquisition functions are more complex in MOPs than in single objective Bayesian optimisation, as the acquisition function must additionally combine the vector of surrogate predictions for each objective into a scalar value. Generalisations of \EI and PI to MOPs have been made by deploying mono-surrogates to jointly model the parameter space/objective space mapping, and then multi-dimensional integration is applied to calculate the probability density function for a given set of parameters \cite{emmerich2006single,keane2006statistical}. The disadvantage of this is that multi-dimensional integration is computationally expensive and quickly becomes impractical due to the \textit{curse of dimensionality} associated with the dimensional increase resulting from the inclusion of additional objectives. More generally the acquisition function involves a function to interpolate between the explored points in the objective space, and then posterior predictions from the surrogate/surrogates are evaluated against this in order to quantify their suitability as candidates. 
 
 \subsection{Related work}\label{section:related_work}
-Bayesian approaches to solving EMOPs tend to use Gaussian Process surrogates and largely differ in the acquisition functions by which they select the parameters at which to next evaluate the true objective function.
+Bayesian approaches to solving EMOPs\mnote{this has been defined as meaning efficient MOP -- not sure it makes sense in here?} tend to use Gaussian Process surrogates and largely differ in the acquisition functions by which they select the parameters at which to next evaluate the true objective function.
 
-The Acquisition functions which have proven most effective leverage measurement of the expected improvement to the $\mathcal{S}$-metric  \cite{emmerich2008computation}. That is the expected improvement to the hypervolume of objective space which is dominated by the the set of Pareto optimal solutions resulting from the inclusion of the GP model posterior prediction. First suggested by Emmerich \cite{emmerich2006single} as a pre-screening method for assisting GA optimisation, this approach naturally converges towards a set of solutions which well represent the Pareto front, as maximising the dominated hypervolume and finding the true Pareto set are equivalent \cite{fleischer2003measure}. 
+The Acquisition functions which have proven most effective leverage measurement of the expected improvement to the $\mathcal{S}$-metric  \cite{emmerich2008computation}. That is the expected improvement to the hypervolume of objective space which is dominated by the set of (estimated) Pareto optimal solutions resulting from the inclusion of the GP model posterior prediction. First suggested by Emmerich \cite{emmerich2006single} as a pre-screening method for assisting genetic algorithm (GA) optimisation, this approach naturally converges towards a set of solutions which well represent the Pareto front, as maximising the dominated hypervolume and finding the true Pareto set are equivalent \cite{fleischer2003measure}. 
 
-However, the computation required for the dominated hypervolume scales poorly with both increased dimensionality of the objective space and increased number of Pareto-optimal solutions in the set of points evaluated by the true objective function. With even the most efficient algorithms scaling as $O(n^D)$, where $n$ is the number of points in the non-dominated set $\mathcal{P}\in\{\bx_1, \cdots, \bx_n\}$, for up to tri-objective problems, and potentially worse beyond that \cite{hupkens2014faster}. Furthermore increasing $D$ is often tied to a further increase in $n$ as there is greater likelihood of unique optimality in at least one combination of objectives and current methods of hypervolume computation quickly become intractable as the number of objectives increase. Nevertheless acquisition functions which compute the hypervolume improvement currently make up the stat-of-the art for EMO. \smsego \cite{ponweiser2008multiobjective,wagner2010expected} performs well for problems with few objectives, and reduces the need for computation of the expected improvement to the hypervolume by applying a cheaper penalty function for predictions which fall within the region dominated $\mathcal{P}$. However, optimisation depends on the stetting of a well-placed reference point for the $\mathcal{S}$-metric calculation. Positioning of this reference vector requires some knowledge of the scales of the objective space, and poor positioning can bias the optimisation in favour of some objectives. 
+However, the computation required for the dominated hypervolume scales poorly with both increased dimensionality of the objective space and increased number of Pareto-optimal solutions in the set of points evaluated by the true objective function. With even the most efficient algorithms scaling as $O(n^D)$, where $n$ is the number of points in the non-dominated set $\mathcal{P}\in\{\bx_1, \cdots, \bx_n\}$, for up to tri-objective problems, and potentially worse beyond that \cite{hupkens2014faster}. Furthermore increasing $D$ is often tied to a further increase in $n$ as there is greater likelihood of unique optimality in at least one combination of objectives and current methods of hypervolume computation quickly become intractable as the number of objectives increase. Nevertheless acquisition functions which compute the hypervolume improvement currently make up the state-of-the art for EMO.\mnote{EMO is undefined, do you mean EMOP?} \smsego \cite{ponweiser2008multiobjective,wagner2010expected} performs well for problems with few objectives, and reduces the need for computation of the expected improvement to the hypervolume by applying a cheaper penalty function for predictions which fall within the region dominated $\mathcal{P}$. However, optimisation depends on the setting of a well-placed reference point for the $\mathcal{S}$-metric calculation. Positioning of this reference vector requires some knowledge of the scales of the objective space, and poor positioning can bias the optimisation in favour of some objectives. 
 
 Less expensive methods exist and involve dynamically altering the weighting applied to each objective during the optimisation process. Parego\cite{knowles2006parego}, does this by periodically generating a random weight vector which dictates the relative importance of each objective. Operating on a mono-surrogate model this is computationally efficient, and is well regarded in that respect, and while it will produce a set of solutions approximating the Pareto set, it converges in many more evaluations of the true objective function than \smsego.
 
@@ -497,7 +498,7 @@ In single-objective Bayesian optimisation, it has recently been suggested that e
 \end{figure}
 
 \begin{itemize}
-    \item What is it? Infill criteria based on minimax distance, using the mean prediction of the gp. 
+    % \item What is it? Infill criteria based on minimax distance, using the mean prediction of the gp. 
     \item why? 
         \begin{itemize}
         \item meets the requirements of... dominance preservation
@@ -514,7 +515,9 @@ In single-objective Bayesian optimisation, it has recently been suggested that e
     \end{itemize}
 \end{itemize}
 
-We propose using a signed \maximin distance from the attainment front, similar to that used by Svenson \citep{svenson2016multiobjective}, as the infill criterion for a multi-surrogate assisted EMO optimisation process with GP surrogates as proposed by Emmerich \cite{emmerich2006single}. We will forgo the popular \EI computation in favour of a more exploitative mean prediction as explored be DeAth \cite{death2019greed}. In doing this we hope to simultaneously emulate the benefits observed from mean prediction EMO on complex optimisations discussed there, and include a gradient to the region of the objective space which is dominated by the current attainment surface. 
+We propose using a signed \maximin distance from the attainment front, similar to that used by Svenson \citep{svenson2016multiobjective}, as the infill criterion for a multi-surrogate assisted EMO optimisation process with GP surrogates as proposed by Emmerich \cite{emmerich2006single}. We will forgo the popular \EI computation in favour of mean prediction in order as explored by DeAth \cite{death2019greed}.
+
+
 
 pseudocode here \ref{alg:ourAlg_pseudocde}.
 
@@ -551,7 +554,7 @@ pseudocode here \ref{alg:ourAlg_pseudocde}.
  }
  $\mathcal{P} \gets \data$ \algremark{Select non-dominated evaluations according to \eqref{eqn: Pareto_set}}
  \Return $\mathcal{P}$ \algremark{Approximation to the Pareto set}
- \caption{SAF} 
+ \caption{\safmu} 
  \label{alg:ourAlg_pseudocde} 
 \end{algorithm}
 
@@ -694,7 +697,7 @@ It appears that broadly speaking \safmu does not surpass the performance of \sms
 \begin{table}[t]
     \setlength{\tabcolsep}{2pt}
     \sisetup{table-format=1.2e-1,table-number-alignment=center}
-    \resizebox{0.5\textwidth}{!}{%
+    \resizebox{0.45\textwidth}{!}{%
     \begin{tabular}{|l|l|l|}
         \hline
         Optimiser name & surrogate  & Comment\\
@@ -713,7 +716,7 @@ It appears that broadly speaking \safmu does not surpass the performance of \sms
 \end{table}
 
 
-The WFG problems are intentionally constructed to cover significantly different numerical ranges in the domains of each of their objectives. This presents a problem to the DHV measurement, as the computation of the HV depends heavily on the scales of the objectives. A common solution to this is to optimise a scaled version of the WFG problems where the ranges of each dimension have been normalised, and to set the reference point for the DHV measurement within this scaled objective space, equidistant from the origin \cite{}. To do this is to assume prior knowledge about the objective function, information which is not typically available in real-world problems. \smsego uses the dominated hypervolume measurement in its process of assessing candidate solutions, and to scale the objectives a priori and provide an ideally positioned reference point is not realistic in a real application. Furthermore setting the DHV reference point for \smsego identically to that against which it is assessed will inevitably give \smsego an unfair advantage, when assessed by the DHV criterion. Instead we will require \smsego to set its own reference point and scale the objectives accordingly. This will be done dynamically during the optimisation in order to normalise the range of each objective present in the non-dominated set of observations. 
+The WFG problems are intentionally constructed to cover significantly different numerical ranges in the domains of each of their objectives. This presents a problem to the DHV measurement, as the computation of the HV depends heavily on the scales of the objectives. A common solution to this is to optimise a scaled version of the WFG problems where the ranges of each dimension have been normalised, and to set the reference point for the DHV measurement within this scaled objective space, equidistant from the origin. To do this is to assume prior knowledge about the objective function, information which is not typically available in real-world problems. \smsego uses the dominated hypervolume measurement in its process of assessing candidate solutions, and to scale the objectives a priori and provide an ideally positioned reference point is not realistic in a real application. Furthermore setting the DHV reference point for \smsego identically to that against which it is assessed will inevitably give \smsego an unfair advantage, when assessed by the DHV criterion. Instead we will require \smsego to set its own reference point and scale the objectives accordingly. This will be done dynamically during the optimisation in order to normalise the range of each objective present in the non-dominated set of observations. 
 
 
 

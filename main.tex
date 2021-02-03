@@ -491,6 +491,8 @@ Acquisition functions are more complex in MOPs than in single objective Bayesian
 
 In our proposed \safmu  method, the expected maximin fitness improvement function proposed by Svenson \citep{svenson2016multiobjective} is adapted to an infill criterion calculated as the signed maximin distance, centred at zero, from the summary attainment front. 
 
+
+
 We propose combining several components discussed in section \ref{section:related_work}, which have independently demonstrated advantages in efficient optimisation, be it in the domain of single or multi-objective optimisaiont. We propose a Bayesian approach to optimisation using GPs to model the objective function, and using the inexpensive and dominance preserving maximin function described in \cite{svenson2016multiobjective}, but forgoing the popular EI computation in favour of a more exploitative approach as explored in \cite{death2019greed}. To achieve this we will use the surrogate assisted EMO strategy with GP surrogates, as proposed by Emmerich \cite{emmerich2006single} using a multi-surrogate GP model, but using only the mean prediction of the surrogates when making predictions about new parameters, in order to emphasise exploitation, and hope that the complexity of MOPs will produce sufficient fortuitous exploration, without the need to actively pursue it. We propose combining the surrogate predictions of such maximia through an acquisition function which uses the maximin distance from the non-dominated observations. Pseudo-code for our proposed algorithm can be seen in Algorithm \ref{alg:ourAlg_pseudocde}.
 
 \begin{algorithm}[t!]

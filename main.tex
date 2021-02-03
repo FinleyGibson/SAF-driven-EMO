@@ -26,7 +26,7 @@
 
 
 
-\documentclass[sigconf,margin=15mm]{acmart}
+\documentclass[sigconf,margin=15mm, dvipsnames, table]{acmart}
 
 \usepackage{booktabs,multirow,array,caption,hhline}
 \newcolumntype{N}{@{}m{0pt}@{}}
@@ -56,7 +56,18 @@
 \usepackage{xspace}
 \captionsetup{compatibility=false}
 \usepackage[ruled,vlined, linesnumbered]{algorithm2e}
+\usepackage{import}
+
+% table and siunits
+\usepackage{tabularx, siunitx}
+
+% best technique and join best labels
+%\newcommand{\best}{\color{red}}
+%\newcommand{\statsimilar}{\color{blue}}
+\newcommand{\best}{{\cellcolor[gray]{0.75}}}
+\newcommand{\statsimilar}{{\cellcolor[gray]{0.9}}}
 \newcommand{\algremark}[1]{\tcc*[r]{#1}}
+
 % Used for displaying a sample figure. If possible, figure files should
 % be included in EPS format.
 %
@@ -536,6 +547,7 @@ In single-objective Bayesian optimisation, it has recently been suggested that e
 
 
 \section{Experimental evaluation}
+\subsection{Process}
 In this section an analysis is conducted of the performance of \safmu over 150 evaluations of a set of challenging, synthetic MOPS. For comparison we also benchmark the performance against the state-of-the art \smsego \citep{ponweiser2008multiobjective} and the computationally efficient \parego \citep{knowles2006parego} and \mpoi as the infill criteria method suggested by Rahat \etal \citep{rahat2017alternative}. For \smsego we include the later improvements to the treatment of the objective space dominated by the attainment surface described by Wagner \etal \citep{wagner2010expected}, and the prior knowledge of the objective space required to set the reference point for the hypervolume calculation is assumed to be unknown. Instead the reference point is updated at each evaluation to the maximum value observed in each objective by the points in the current attainment surface multiplied by a factor of $1.5$. $\mref \gets \max(\pattainment)$. In order to test the second part of our hypothesis, that more explitative search will be beneficial, we also include the \EI based \minimax model proposed by Svenson \citep{svenson2016multiobjective}, (hereby denoted as \safei), and also a version of \smsego, where the uncertainty from the \GP is ignored, instead using mean prediction only, with no correction for $\epsilon$ (denoted \smsegomu.  
 
 Each optimisation is started from 10 initial \lhs samples, over 31 repeat optimisations of each problem. The repeats are structured so that the same random seed and \lhs samples are used for all optimisation methods within each repeat, and the surrogate used in each of the surrogate methods is an identical \GP applied to the data normalised at each step to have $\mu=0$, $\sigma=1$. Where required the dominated hypevolume is calculated using the Fonseca hypervolume method \citep{fonseca2006improved}.
@@ -586,25 +598,72 @@ where $d_j$ is the nearest modified Euclidean distance drom $\mathbf{z}_j \in \p
 \begin{equation}
     d^+(\mathbf{z}, \mathbf{a}) = \sqrt{(\max\{a_1-z_1, 0\}+\cdots+\max\{a_m-z_m, 0\})}
 \end{equation}
-Measurements using \igd rely on a set of reference points $\pigdref$ on the problem's Pareto surface. In order to ensure no bias toward solutions found in localised regions of this surface it is important that the points be distributed evenly, which is not guaranteed once random samples have been mapped to the Pareto surface with the \textit{Shape Functions} described in the WFG function definitions. In order to achieve an even distribution, this we first sample an uneven, but dense population of points on this Pareto surface, and then calculate a set of evenly distributed points on the attainment surface generated using the methods described by Smith \etal \citep{smith2004dominance}. Attainment surface points which do not lie on the Pareto surface, were then discarded if their nearest neighbour in the set of Pareto optimal points, was greater than a certain threshold. This sampling method was used for all functions with the exception of WFG3, for which the Pareto surface is trivial to compute and sample evenly, and the reference points for the ellipsoidal WFG4 are shown in fig XXX.  
+Measurements using \igd rely on a set of reference points $\pigdref$ on the problem's Pareto surface. In order to ensure no bias toward solutions found in localised regions of this surface it is important that the points be distributed evenly, which is not guaranteed once random samples have been mapped to the Pareto surface with the \textit{Shape Functions} described in the WFG function definitions. In order to achieve an even distribution, this we first sample an uneven, but dense population of points on this Pareto surface, and then calculate a set of evenly distributed points on the attainment surface generated using the methods described by Smith \etal \citep{smith2004dominance}. Attainment surface points which do not lie on the Pareto surface, were then discarded if their nearest neighbour in the set of Pareto optimal points, was greater than a certain threshold. This sampling method was used for all functions with the exception of WFG3, for which the Pareto surface is trivial to compute and sample evenly, and the reference points for the ellipsoidal WFG4 are shown in Figure \ref{fig: refpoints_wfg4}.  
 
-\begin{figure}[h]
+\begin{figure}[t]
 \includegraphics[width=\columnwidth]{figures/_IGD_refpoint_example_WFG4.pdf}
-\caption{\igd reference points, }
+\caption{\igd reference points, for 3 objective WFG4.}
 \label{fig: refpoints_wfg4}
 \end{figure}
 
-
-\begin{itemize}
-    \item HOW ASSESSED
+% \begin{itemize}
+    % \item HOW ASSESSED
     % \item which problems chosen?
     % \item why problems chosen? build on DTLZ, include various features (multimodal, convex, separable). 
     % \item why d6? reduced dimensionality for wfg1 to facilitate finding better solutions
     % \item measurements taken using dominated hypervolume and igd+
     % \item igd+ samples taken by oversampling the pareto front, and then drawing a random sample from this using the attainment sampling techinique described in richards paper. 
     % \item results compared by their median value, with statistical equivlance tested using Holm-bonferoni corrected wilcoxen signed rank test. 
-    \item problem table
-\end{itemize}
+    % \item problem table
+% \end{itemize}
+
+\subsection{Findings}
+
+\begin{table}[h]
+
+\begin{subtable}[b]{\columnwidth}
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\columnwidth}{!}{%
+\import{tables/}{hv_table_1.tex}}
+\end{subtable}
+
+\begin{subtable}[b]{\columnwidth}
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\columnwidth}{!}{%
+\import{tables/}{hv_table_2.tex}}
+\end{subtable}
+
+\begin{subtable}[b]{\columnwidth}
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\columnwidth}{!}{%
+\import{tables/}{hv_table_3.tex}}
+\end{subtable}
+
+\caption{}
+\end{table}
+
+
+
+\begin{figure}[t]
+\begin{subfigure}[b]{\columnwidth}
+         \centering
+         \includegraphics[width=\columnwidth]{figures/_ranked_performance_plot_hv.pdf}
+        %  \caption{}
+        %  \label{fig: ranked_hv_plot}
+     \end{subfigure}
+\begin{subfigure}[b]{\columnwidth}
+         \centering
+         \includegraphics[width=\columnwidth]{figures/_ranked_performance_plot_igd.pdf}
+        %  \caption{}
+        %  \label{fig: ranked_igf_plot}
+     \end{subfigure}
+\caption{ranks}
+\label{fig: ranked_plots}
+\end{figure}
+
 
 \begin{itemize}
     \item OVERALL
@@ -614,8 +673,8 @@ Measurements using \igd rely on a set of reference points $\pigdref$ on the prob
     \item this only considers a snapshot of the optimisation process when the optimiser have largely converged. The ranked order can be seen in fig X. "ranks adjusted for equivalence". 
     \item WFG1 and 2 converged poorly by infill criteria methods
     \item WFG2 converged poorly by all methods
-    
 \end{itemize}
+
 \begin{itemize}
         \item HYPOTHESIS ONE: SAF JUST AS GOOD
         \item Optimisations where saf beats sms, visa versa

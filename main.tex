@@ -61,7 +61,7 @@
 \DeclareMathOperator*{\nevaluations}{m}
 \DeclareMathOperator*{\nbudget}{B}
 \DeclareMathOperator*{\parameterspace}{\Omega}
-\DeclareMathOperator*{\ndim}{n}
+\DeclareMathOperator*{\ndim}{d}
 \DeclareMathOperator*{\nobj}{M}
 \DeclareMathOperator*{\rp}{\mathbf{R}}
 
@@ -348,7 +348,7 @@ The criterion should be easy to implement and efficient to calculate
 
 The $\saf$ distance measure ensures that observations which fall in the region between two points on $\attainmentfront$, in the region that is neither dominated by, nor dominates any point in $\attainmentfront$, are viewed as preferable observations, even if their Euclidean distance to the ideal observation (the origin) is equivalent. This ensures \textit{D1} is satisfied. \textit{D2} is also satisfied, due to the continuous nature of the distance measure in each individual objective, and the simple additive combination of objective distances. The smooth-continuous gradient towards the ideal solution, without plateaus or basins, satisgying \textit{D3}. The computation of \safmu is computationally trivial, much more so than the hypervolume computation required to produce \smsego, and increases linearly with the addition of more objectives. Additionally the $\saf$ infill criteria does not require uncertainty values associated with the posterior surrogate prediction in its calculation, and although Svensons \cite{svenson2016multiobjective} method does require these in order to estimate the \ei over $\saf$ our exploitative \safmu approach avoids these requirements all together, broadening the scope of suitable surrogates. The full process for optimisation under \safmu is summarised in Algorithm  \ref{alg:ourAlg_pseudocde}, and described as follows:
 
-Initially a series of $\ninitialevaluations$ evaluations of the objective function are made via  Latin hypercube sampling, These initial samples are then expensively evaluated by the objective function to produce a set of observed function values  $\data = \{(\bx_t, \bff_t)\}_{t=1}^{\ninitialevaluations}$ (line \ref{alg:inital-evals}). Separate \gp surrogates are then fitted, one for each of the $\nobj$ objectives (line \ref{alg:train_gp}). Here we use Mat{\'e}rn $5/2$ kernel (as recommended for modelling realistic functions \cite{snoek:practical}) and the parameters of these \gps are
+Initially a series of $\ninitialevaluations$ evaluations of the objective function are made via  Latin hypercube sampling, These initial samples are then expensively evaluated by the objective function to produce a set of observed function values  $\data = \{(\bx_t, \bff_t)\}_{t=1}^{\ninitialevaluations}$ (line \ref{alg:inital-evals}). Separate \gp surrogates are then fitted, one for each of the $\nobj$ objectives (line \ref{alg:train_gp}). Here we use Mat{\'e}rn $5/2$ kernel (as recommended for modelling realistic functions \cite{snoek2012practical}) and the parameters of these \gps are
 learned by maximising the marginal log likelihood. As described in detail in \S\ref{section: infill_criterion}, our $\saf$ acquisition function, then converts the joint prediction
 of these GP surrogates into a scalar prediction of a candidate solution's
 efficacy. The location in objective space for the next expensive

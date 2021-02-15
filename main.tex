@@ -464,9 +464,18 @@ where $d^{+}$ is the modified Euclidean distance given by:
 Measurements using \igd rely on a set of reference points $\pigdref$ on the problem's Pareto front. In order to ensure no bias toward solutions found in localised regions of this surface it is important that the points be distributed evenly, which is not guaranteed once random samples have been mapped to the Pareto surface with the \textit{Shape Functions} described in the WFG function definitions. In order to achieve an even distribution, we first sample an uneven, but dense population of points on this Pareto front, by evenly sampling the parameter space and applying the aforementioned Shape functions, then calculate a set of evenly distributed points on the attainment surface generated using the methods described by Smith \etal \cite{smith2004dominance}. Attainment surface points which do not lie on the Pareto surface, are then discarded if their nearest neighbour in the set of Pareto optimal points, was greater than a certain threshold. This sampling method was used for all functions with the exception of WFG3, for which the Pareto surface is trivial to compute and sample evenly. The reference points for the ellipsoidal WFG4 with three objectives are shown in Figure \ref{fig: refpoints_wfg4}.  
 
 \begin{figure}[t]
-\includegraphics[width=\columnwidth]{figures/_IGD_refpoint_example_WFG4.pdf}
-\caption{\igd reference points, for 3 objective WFG4.}
-\label{fig: refpoints_wfg4}
+\begin{subfigure}[t]{0.45\columnwidth}
+    \includegraphics[width=\columnwidth]{figures/_IGD_refpoint_example_WFG4.pdf}
+    \caption{WFG4, WFG5 \& WFG6}
+    \label{fig: refpoints_wfg4}
+\end{subfigure}
+\begin{subfigure}[t]{0.45\columnwidth}
+    \includegraphics[width=\columnwidth]{figures/_IGD_refpoint_example_WFG2.pdf}
+    \caption{WFG2}
+    \label{fig: refpoints_wfg2}
+\end{subfigure}
+\caption{\igd reference points, for 3 objective WFG problems.}
+
 \end{figure}
 
 % \begin{itemize}

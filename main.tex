@@ -89,10 +89,7 @@
 
 
 \DeclareMathOperator*{\igdp}{IGD^{+}}
-
-
-
-
+\newcommand\hpv{Dominated Hypervolume\xspace}
 \newcommand\safmu{SAF$_{\mu}$\xspace}
 \newcommand\safei{SAF$_{EI}$\xspace}
 \newcommand\smsego{SMS-EGO\xspace}
@@ -189,7 +186,7 @@
 
     %Efficient methods for optimising expensive black-box problems with multiple objectives can often themselves become prohibitively expensive as the number of objectives is increased. We propose an approach to efficient optimisation of such problems without the reliance on hypervolume and expected improvement computation, which are the principal causes of poor dimensional scaling in current state-of-the-art  approaches.  We show that our approach is able deliver similar performance to the current state-of-the-art, and further show that approaches based on surrogate mean predictions are superior to the widely used \textit{expected improvement} when\mnote{with?} the Gaussian process surrogate models, typically applied. Performance is evaluated on the well-known Walking Fish Group problem set, against current state-of-the art approaches. 
  
-    Efficient methods for optimising expensive black-box problems with multiple objectives can often themselves become prohibitively expensive as the number of objectives is increased. We propose an infill criterion based on the distance to the summary attainment front which does not rely on the expensive hypervolume or expected improvement computations, which are the principal causes of poor dimensional scaling in current state-of-the-art approaches. By evaluating performance on the well-known Walking Fish Group problem set, against current state-of-the art approaches, we show that our method  delivers similar performance to the current state-of-the-art.  We further show that methods based on surrogate mean predictions are more often than not superior to the widely used expected improvement, suggesting that the additional exploration produced by accounting for the uncertainty in the surrogate's prediction of the optimisation landscape is often unnecessary and does not aid convergence towards the Pareto front. 
+    Efficient methods for optimising expensive black-box problems with multiple objectives can often themselves become prohibitively expensive as the number of objectives is increased. We propose an infill criterion based on the distance to the summary attainment front which does not rely on the expensive hypervolume or expected improvement computations, which are the principal causes of poor dimensional scaling in current state-of-the-art approaches. By evaluating performance on the well-known Walking Fish Group problem set, against current state-of-the art approaches, we show that our method  delivers similar performance to the current state-of-the-art --- without exhibiting the aforementioned scaling issues.  We further show that methods based on surrogate mean predictions are more often than not superior to the widely used expected improvement, suggesting that the additional exploration produced by accounting for the uncertainty in the surrogate's prediction of the optimisation landscape is often unnecessary and does not aid convergence towards the Pareto front. 
 
 \end{abstract}
 
@@ -311,20 +308,20 @@ Acquisition functions are more complex in MOPs than in single objective Bayesian
 \subsection{Related work}\label{section:related_work}
 Bayesian approaches to solving MOPs tend to use Gaussian Process surrogates and largely differ in the acquisition functions by which they select the parameters at which to next evaluate the true objective function.
 
-The Acquisition functions which have proven most effective leverage measurement of the expected improvement to the $\mathcal{S}$-metric  \cite{emmerich2008computation}. That is the expected improvement to the hypervolume of objective space which is dominated by the set of (estimated) Pareto optimal solutions resulting from the inclusion of the \gp model posterior prediction. First suggested by Emmerich \etal  \cite{emmerich2006single} as a pre-screening method for assisting genetic algorithm (GA) optimisation, this approach naturally converges towards a set of solutions which well represent the Pareto front, as maximising the dominated hypervolume and finding the true Pareto set are equivalent \cite{fleischer2003measure}. 
+The Acquisition functions which have proven most effective leverage measurement of the expected improvement to the $\mathcal{S}$-metric  \cite{emmerich2008computation}. That is the expected improvement to the hypervolume of objective space which is dominated by the set of (estimated) Pareto optimal solutions resulting from the inclusion of the \gp model posterior prediction. First suggested by Emmerich \etal  \cite{emmerich2006single} as a pre-screening method for assisting genetic algorithm (GA) optimisation, this approach naturally converges towards a set of solutions which well represent the Pareto front, as maximising the \hpv and finding the true Pareto set are equivalent \cite{fleischer2003measure}. 
 
-However, the computation required for the dominated hypervolume scales poorly with both increased dimensionality of the objective space and increased number of Pareto-optimal solutions in the set of points evaluated by the true objective function. With even the most efficient algorithms scaling as $O(n^D)$, where $n$ is the number of points in the non-dominated set $\mathcal{P}\in\{\bx_1, \cdots, \bx_n\}$, for up to tri-objective problems, and potentially worse beyond that \cite{hupkens2014faster}. Furthermore increasing $D$ is often tied to a further increase in $n$ as there is greater likelihood of unique optimality in at least one combination of objectives and current methods of hypervolume computation quickly become intractable as the number of objectives increase. Nevertheless acquisition functions which compute the hypervolume improvement currently make up the state-of-the art for expensive MOPs. \smsego \cite{ponweiser2008multiobjective, wagner2010expected} performs well for problems with few objectives, and reduces the need for computation of the expected improvement to the hypervolume by applying a cheaper penalty function for predictions which fall within the region dominated $\mathcal{P}$. However, optimisation depends on the setting of a well-placed reference point for the $\mathcal{S}$-metric calculation. Positioning of this reference vector requires some knowledge of the scales of the objectives, and poor positioning can bias the optimisation in favour of some objectives over others. 
+However, the computation required for \hpv scales poorly with both increased dimensionality of the objective space and increased number of Pareto-optimal solutions in the set of points evaluated by the true objective function. With even the most efficient algorithms scaling as $O(n^D)$, where $n$ is the number of points in the non-dominated set $\mathcal{P}\in\{\bx_1, \cdots, \bx_n\}$, for up to tri-objective problems, and potentially worse beyond that \cite{hupkens2014faster}. Furthermore increasing $D$ is often tied to a further increase in $n$ as there is greater likelihood of unique optimality in at least one combination of objectives and current methods of hypervolume computation quickly become intractable as the number of objectives increase. Nevertheless acquisition functions which compute the hypervolume improvement currently make up the state-of-the art for expensive MOPs. \smsego \cite{ponweiser2008multiobjective, wagner2010expected} performs well for problems with few objectives, and reduces the need for computation of the expected improvement to the hypervolume by applying a cheaper penalty function for predictions which fall within the region dominated $\mathcal{P}$. However, optimisation depends on the setting of a well-placed reference point for the $\mathcal{S}$-metric calculation. Positioning of this reference vector requires some knowledge of the scales of the objectives, and poor positioning can bias the optimisation in favour of some objectives over others. 
 
 Less expensive methods exist and involve dynamically altering the weighting applied to each objective during the optimisation process. ParEGO \cite{knowles2006parego}, does this by periodically generating a random weight vector which dictates the relative importance of each objective. Operating on a mono-surrogate model this is computationally efficient, and is well regarded in that respect, and while it will produce a set of solutions approximating the Pareto set, it tends to converges in many more evaluations of the true objective function than \smsego.\mnote{think you nee a citation for this claim}
 
-Alternatively, simpler methods which model the desirability of posterior predictions by interpolating the unexplored regions between observations in objective-space have been implemented with success. Keane \cite{keane2006statistical} uses the signed objective-space Euclidean distance to the nearest point in $\mathcal{P}$ to interpolate between observations and then the \ei is computed over this to form the acquisition function. However, as discussed in \cite{wagner2010expected} this fails to preserve the dominance relation, and is outperformed by \smsego. Svenson and Santner  \cite{svenson2016multiobjective} retain the dominance relation by using the maximin distance between the \gp posterior prediction and the nearest point in the non-dominated set $\mathcal{P}$. The \ei is then approximated using inexpensive Monte-Carlo estimation. In experiments on the DTLZ problems\mnote{give citation} it is shown to perform comparably with measures of improvement to the dominated hypervolume. Although neither of these interpolation methods require setting of a reference point as in \smsego, they are susceptible to bias depending on the scales of the objectives. Rahat \etal \cite{rahat2017alternative} compare a range of acquisition functions arguing that, although performance seems problem dependant, their proposed inexpensive minimum probability of improvement (MPoI) acquisition function performs comparably to using the hypervolume improvement, and similarly to ParEGO, all such inexpensive acquisition functions however are surpassed consistently by the \smsego state-of-the-art.
+Alternatively, simpler methods which model the desirability of posterior predictions by interpolating the unexplored regions between observations in objective-space have been implemented with success. Keane \cite{keane2006statistical} uses the signed objective-space Euclidean distance to the nearest point in $\mathcal{P}$ to interpolate between observations and then the \ei is computed over this to form the acquisition function. However, as discussed in \cite{wagner2010expected} this fails to preserve the dominance relation, and is outperformed by \smsego. Svenson and Santner  \cite{svenson2016multiobjective} retain the dominance relation by using the maximin distance between the \gp posterior prediction and the nearest point in the non-dominated set $\mathcal{P}$. The \ei is then approximated using inexpensive Monte-Carlo estimation. In experiments on the DTLZ problems \cite{deb2005scalable} it is shown to perform comparably with measures of improvement to the \hpv. Although neither of these interpolation methods require setting of a reference point as in \smsego, they are susceptible to bias depending on the scales of the objectives. Rahat \etal \cite{rahat2017alternative} compare a range of acquisition functions arguing that, although performance seems problem dependant, their proposed inexpensive minimum probability of improvement (MPoI) acquisition function performs comparably to using the hypervolume improvement, and similarly to ParEGO, all such inexpensive acquisition functions however are surpassed consistently by the \smsego state-of-the-art.
 
 In single-objective Bayesian optimisation, it has recently been suggested that exploitative optimisation methods are preferable over those which balance exploit/explore, such as \ei, in problems where the complexity of the problem, causes low fidelity between the surrogate models and the objective function \cite{death2019greed}. They argue that exploitative methods are sufficiently \textit{fortuitously} exploitative in their nature without the need for active exploration. There work showed that deploying an exploitative, $\epsilon$-greedy' optimisation strategy was often preferable in problems where the parameter space was high-dimensional and thus the objective function complex.
 
 
 
 \section{Exploitative SAF}\label{section:our_method}
-We propose using a signed \maximin distance, in the objective space, from the summary attainment front (SAF), similar to that used by Svenson and Santer \cite{svenson2016multiobjective} as the infill criterion for a multi-surrogate assisted EMO optimisation process with \gp surrogates as proposed by Emmerich \etal \cite{emmerich2006single}. We will forgo the popular \ei computation in favour of using only the surrogate posterior mean prediction, in order to take a more exploitative approach to optimisation as suggested by DeAth \etal \cite{death2019greed}. 
+We propose using a signed \maximin distance, in the objective space, from the summary attainment front (SAF), similar to that used by Svenson and Santer \cite{svenson2016multiobjective} as the infill criterion for a multi-surrogate assisted EMO optimisation process with \gp surrogates as proposed by Emmerich \etal \cite{emmerich2006single}. We will forgo the popular \ei computation in favour of using only the surrogate posterior mean prediction, in order to take a more exploitative approach to optimisation as suggested by De~Ath \etal \cite{death2019greed}. 
 
 \subsection{Infill criterion}\label{section: infill_criterion}
 The infill criterion, hereby denoted as \safmu, can be more formally defined as
@@ -412,9 +409,32 @@ evaluation is found, as usual in BO, by maximising the acquisition function
 
 \section{Experimental evaluation}
 \subsection{Process}
-In this section an analysis is conducted of the performance of \safmu over 150 evaluations of a set of challenging, synthetic MOPs. For comparison we benchmark the state-of-the-art \smsego \cite{ponweiser2008multiobjective} and thec ompetitive, yet computationally efficient \parego \cite{knowles2006parego}. We also compare the, cheap-to-evaluate minimum probability of improvement (\mpoi) infill criteria proposed by Rahat \etal \cite{rahat2017alternative}. For \smsego we formulate the optimiser including the later improvements to the treatment of the objective space dominated by the attainment surface described by Wagner \etal \cite{wagner2010expected}, and the prior knowledge of the objective space required to set the reference point for the hypervolume calculation is assumed to be unknown. Instead the reference point $\rp$ is updated at each evaluation to the maximum value observed in each objective by the current attainment front, plus an offset of $1$, as in the original work $\rp = \max(\attainmentfront)+1$\fnote{I dont think this is clear enough, need to show np.axrgmax($\attainmentfront$, axis=0)}. In order to test the second part of our hypothesis, that more exploitative search will be beneficial, we also include the \ei based \maximin model proposed by Svenson and Santner  \cite{svenson2016multiobjective}, (hereby denoted as \safei), and also a version of \smsego, where the uncertainty from the \gp is ignored, instead using mean prediction only, with no correction for $\epsilon$ (denoted \smsegomu.  
+In this section an analysis is conducted of the performance of \safmu over 150 evaluations of a set of challenging, synthetic MOPs. For comparison we benchmark the state-of-the-art \smsego \cite{ponweiser2008multiobjective} and thec ompetitive, yet computationally efficient \parego \cite{knowles2006parego}. We also compare the, cheap-to-evaluate minimum probability of improvement (\mpoi) infill criteria proposed by Rahat \etal \cite{rahat2017alternative}. For \smsego we formulate the optimiser including the later improvements to the treatment of the objective space dominated by the attainment surface described by Wagner \etal \cite{wagner2010expected}, and the prior knowledge of the objective space required to set the reference point for the hypervolume calculation is assumed to be unknown. Instead the reference point $\rp$ is updated at each evaluation to the maximum value observed in each objective by the current attainment front, plus an offset of $1$, as in the original work $\rp = \max(\attainmentfront)+1$\fnote{I dont think this is clear enough, need to show np.axrgmax($\attainmentfront$, axis=0)}. In order to test the second part of our hypothesis, that more exploitative search will be beneficial, we also include the \ei based \maximin model proposed by Svenson and Santner  \cite{svenson2016multiobjective}, (hereby denoted as \safei), and also a version of \smsego, where the uncertainty from the \gp is ignored, instead using mean prediction only, with no correction for $\epsilon$ (denoted \smsegomu), these strategies are listed in table \ref{table:alg_table}\fnote{I don't think this table is really necesary. Left it in for now to gauge your opinions.}.
 
-Each optimisation is started from 10 initial \lhs samples, over 31 repeat optimisations of each test function. The repeats are structured so that the same random seed and \lhs samples are used for all optimisation methods within each repeat, and the surrogate used in each of the surrogate methods is an identical \gp applied to the data which has been normalised at each step to have $\mu=0$, $\sigma=1$. Where required the dominated hypervolume is calculated using the Fonseca \etal hypervolume method \cite{fonseca2006improved}.
+\begin{table}[t]
+    \setlength{\tabcolsep}{2pt}
+    \sisetup{table-format=1.2e-1,table-number-alignment=center}
+    \resizebox{\columnwidth}{!}{%
+    \begin{tabular}{|l|l|l|}
+        \hline
+        Optimiser name & Surrogate  & Comment\\
+        \hline
+        \safei & Multi & \ei version of SAF, as proposed in \cite{svenson2016multiobjective}. \\
+        \safmu & Multi & Our proposed Optimiser. (See Alg. \ref{alg:ourAlg_pseudocde}) \\
+        \smsego& Multi & Current state-of-the-art. \cite{ponweiser2008multiobjective} \\
+        \smsegomu & Multi & Modification to current SOA to be more exploitative.\\
+        \parego & Mono & Efficient computation \cite{knowles2006parego}\\
+        \mpoi & Multi & Benchmark for EMO over infill criteria approach \cite{rahat2017alternative}. \\
+        LHS & None & Baseline comparison to pseudo-uniform sampling $\parameterspace$. \\
+        \hline
+    \end{tabular}}
+    \caption{Optimisation strategies to be compared}\label{tab1}
+    \label{table:alg_table}
+\end{table}
+
+
+
+Each optimisation is started from 10 initial \lhs samples, over 31 repeat optimisations of each test function. The repeats are structured so that the same random seed and \lhs samples are used for all optimisation methods within each repeat, and the surrogate used in each of the surrogate methods is an identical \gp applied to the data which has been normalised at each step to have $\mu=0$, $\sigma=1$. Where required the \hpv is calculated using the Fonseca \etal hypervolume method \cite{fonseca2006improved}.
 
 % \begin{itemize}
     % \item HOW CONDUCTED
@@ -435,13 +455,13 @@ The chosen objective functions for the benchmark tests are a subset the Walking 
 \begin{table}[t]
     \setlength{\tabcolsep}{2pt}
     \sisetup{table-format=1.2e-1,table-number-alignment=center}
-    \resizebox{0.5\textwidth}{!}{%
-        \begin{tabular}{|l|r|l|r|l|}
+    \resizebox{\columnwidth}{!}{%
+        \begin{tabular}{|l|r|r|r|l|}
             \hline
-            Function &  $\nobj$ & $\ndim$ & $d$ & Comment\\
+            Function &  $\nobj$ & $\parameterspace$ & $\ndim$ & Comment\\
             \hline
             WFG1 & 2, 3, 4 & $[0, 2d]^d$ & $3, 4, 5$ &  separable, uni-modal \\
-            WFG2 & 2, 3, 4 & $[0, 2d]^d$ & $6, 6, 10$ & non-separable, multi-modal\footnotemark{}, discontinuous Pareto front \\
+            WFG2 & 2, 3, 4 & $[0, 2d]^d$ & $6, 6, 10$ & non-separable, multi-modal\footnotemark{}, $\paretofront$ is discontinuous. \\
             WFG3 & 2, 3, 4 & $[0, 2d]^d$ & $6, 10, 10$ &  non-separable, uni-modal \\
             WFG4 & 2, 3, 4 & $[0, 2d]^d$ & $6, 8, 8$ & separable, multi-modal\\
             WFG5 & 2, 3, 4 & $[0, 2d]^d$ & $6, 8, 10$ & separable, deceptive\\
@@ -452,7 +472,7 @@ The chosen objective functions for the benchmark tests are a subset the Walking 
 \end{table}
 \footnotetext{Multi-modal in only the first objective $f^{1}$, uni-modal in $f^{2} \cdots f^{\nobj}$.}
 
-Two metrics are used to quantify the performance of each optimiser. The first is the dominated hypervolume measure, this is a commonly used means of measuring convergence toward the Pareto front, but as it is also the principal computation behind the $\mathcal{S}$-metric in \smsego. As such we also compare measurements of the Inverted Generational Distance plus (\igd) \cite{ishibuchi2015modified} in order to reduce any unfair advantage to \smsego. $\igdp$ is calculated as:
+Two metrics are used to quantify the performance of each optimiser. The first is the \hpv measure, this is a commonly used means of measuring convergence toward the Pareto front, but as it is also the principal computation behind the $\mathcal{S}$-metric in \smsego. As such we also compare measurements of the Inverted Generational Distance plus (\igd) \cite{ishibuchi2015modified} in order to identify any undue bias in favour of the \smsego and \smsegomu methods. $\igdp$ is calculated as:
 \begin{equation}
     \igdp(\attainmentfront, \pigdref) = \frac{1}{\abs{\pigdref}}
     \sum_{\mathbf{z}\in\pigdref} \min_{\mathbf{a}\in \attainmentfront} d^{+}(\mathbf{a}, \mathbf{z})
@@ -461,7 +481,7 @@ where $d^{+}$ is the modified Euclidean distance given by:
 \begin{equation}
     d^+(\mathbf{z}, \mathbf{a}) = \sqrt{\sum^{\nobj}_{i=1}\max(a_i - z_i, 0)^2}
 \end{equation}
-Measurements using \igd rely on a set of reference points $\pigdref$ on the problem's Pareto front. In order to ensure no bias toward solutions found in localised regions of this surface it is important that the points be distributed evenly, which is not guaranteed once random samples have been mapped to the Pareto surface with the \textit{Shape Functions} described in the WFG function definitions. In order to achieve an even distribution, we first sample an uneven, but dense population of points on this Pareto front, by evenly sampling the parameter space and applying the aforementioned Shape functions, then calculate a set of evenly distributed points on the attainment surface generated using the methods described by Smith \etal \cite{smith2004dominance}. Attainment surface points which do not lie on the Pareto surface, are then discarded if their nearest neighbour in the set of Pareto optimal points, was greater than a certain threshold. This sampling method was used for all functions with the exception of WFG3, for which the Pareto surface is trivial to compute and sample evenly. The reference points for the ellipsoidal WFG4 with three objectives are shown in Figure \ref{fig: refpoints_wfg4}.  
+Measurements using \igd rely on a set of reference points $\pigdref$ on the problem's Pareto front. In order to ensure no bias toward solutions found in localised regions of this surface it is important that the points be distributed evenly, which is not guaranteed once random samples have been mapped to the Pareto surface with the \textit{Shape Functions} described in the WFG function definitions. In order to achieve an even distribution, we first sample an uneven, but dense population of points on this Pareto front, by evenly sampling the parameter space and applying the aforementioned Shape functions, then calculate a set of evenly distributed points on the attainment surface generated using the methods described by Smith \etal \cite{smith2004dominance}. Attainment surface points which do not lie on the Pareto surface, are then discarded if their nearest neighbour in the set of Pareto optimal points, was greater than a certain threshold. This sampling method was used for all functions with the exception of WFG3, for which the Pareto surface is trivial to compute and sample evenly. The reference points for the ellipsoidal WFG4 with three objectives are shown in figure \ref{fig: refpoints_wfg4}.  
 
 \begin{figure}[t]
 \begin{subfigure}[t]{0.45\columnwidth}
@@ -490,22 +510,31 @@ Measurements using \igd rely on a set of reference points $\pigdref$ on the prob
 % \end{itemize}
 
 \subsection{Discussion}
-The results of the optimisations, as measured by \igd are summarised in table \ref{tab: igd_results}. The performances of the optimisers are, as we may expect, somewhat problem dependant. After the full 150 budgeted evaluations of the objective functions, \safmu either had the lowest median \igd score, or did not differ significantly from the optimiser with the best score in 9 of the 18 tested problems, this is one more than the state-of-the art \smsego, but is equalled by the exploitative adaption \smsegomu. As we might expect, when measured by the $\mathcal{S}$-metric measure the results are somewhat more favourable to \smsego and \smsegomu, with \safmu only being equivalent to the best performer on 9 optimisations, as opposed to \smsegomu's 9. 
-
-Table \ref{tab: igd_results}  however, only considers a slice of the optimisation process, when the algorithms have largely converged. Figure \ref{fig: ranked_plots}\mnote{what are the two different panels showing? why does LHS start at 2 not 1 in the bottom panel?} shows average ranking of each optimiser across all repeats and all problems in the experimental setup, at each step of the optimisation process. Where the difference between optimisations of similar rank have not been statistically significant, as judged by the Wilcoxon signed rank test, the two were assigned the same rank, hence the divergence as the optimisations progress. From this it is clear that \smsegomu performs best in the later stages, whether measuring by \igd or dominated hypervolume, but \safmu is second best by both of these measurement, although performance is similar to \smsego. 
-
-It should be noted that all optimisers performed poorly on WFG2, with the majority of the Pareto Front left unexplored. \parego performed relatively well compared to the other methods, but many of the surrogate models were beaten by the \lhs benchmark here. It is worth noting that WFG2 is the only problem here with a discontinuous Pareto front, and also the only problem in which the boundary between the attainable and unattainable objective space regions, on which the Pareto front lies, extends into the area dominated by the points on the Pareto front. This means much of the objective space, in between the acquired evaluations, and favoured by the infill criteria may unattainable at each step This is a feature which distinguishes this function from the others tested here but could be a factor in the poorer performance by optimisers reliant on infill criteria.\fnote{Not sure this makes sense. We should talk about it and see if you both think it is relevant.} %In all other problems, any point dominated by the current attainment set, is guaranteed to be also attainable. This is not the case for WFG2. 
 
 
-% \begin{itemize}
-%     \item OVERALL
-%     % \item As expected performance was problem-specific
-%     % \item over the full 150 evaluations SAF-MU was the best performer or equivalent on 7 problems. The same as Sms EI. SMS-Mu was best with 9.
-%     % \item For IGD+, saf-mu best on 9. SMS EI best on 8. SMS-MU also best on 9.
-%     % % \item this only considers a snapshot of the optimisation process when the optimiser have largely converged. The ranked order can be seen in fig X. "ranks adjusted for equivalence". 
-%     % \item WFG1 and 2 converged poorly by infill criteria methods
-%     % \item WFG2 converged poorly by all methods
-% \end{itemize}
+\begin{table}[t]
+\begin{subtable}[b]{\columnwidth}
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\columnwidth}{!}{%
+\import{tables/}{hv_table_1.tex}}
+\end{subtable}
+\begin{subtable}[b]{\columnwidth}
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\columnwidth}{!}{%
+\import{tables/}{hv_table_2.tex}}
+\end{subtable}
+\begin{subtable}[b]{\columnwidth}
+\setlength{\tabcolsep}{2pt}
+\sisetup{table-format=1.2e-1,table-number-alignment=center}
+\resizebox{\columnwidth}{!}{%
+\import{tables/}{hv_table_3.tex}}
+\end{subtable}
+\caption{D\hpv after 150 function evaluations.}
+\label{tab: hv_results}
+\end{table}
+
 
 \begin{table}[t]
 \begin{subtable}[b]{\columnwidth}
@@ -530,82 +559,62 @@ It should be noted that all optimisers performed poorly on WFG2, with the majori
 \label{tab: igd_results}
 \end{table}
 
-\begin{table}[t]
-\begin{subtable}[b]{\columnwidth}
-\setlength{\tabcolsep}{2pt}
-\sisetup{table-format=1.2e-1,table-number-alignment=center}
-\resizebox{\columnwidth}{!}{%
-\import{tables/}{hv_table_1.tex}}
-\end{subtable}
-\begin{subtable}[b]{\columnwidth}
-\setlength{\tabcolsep}{2pt}
-\sisetup{table-format=1.2e-1,table-number-alignment=center}
-\resizebox{\columnwidth}{!}{%
-\import{tables/}{hv_table_2.tex}}
-\end{subtable}
-\begin{subtable}[b]{\columnwidth}
-\setlength{\tabcolsep}{2pt}
-\sisetup{table-format=1.2e-1,table-number-alignment=center}
-\resizebox{\columnwidth}{!}{%
-\import{tables/}{hv_table_3.tex}}
-\end{subtable}
-\caption{Dominated hypervolume results after 150 function evaluations.}
-\label{tab: hv_results}
-\end{table}
+The results of the optimisations, as measured by \hpv are summarised in table \ref{tab: hv_results}, and those measured by \igd in table \ref{tab: igd_results}. As may be expected, the performances of the optimisers are somewhat problem dependant, but after the full 150 budgeted evaluations of the objective functions, \safmu either had the lowest median \igd score, or did not differ significantly from the optimiser with the lowest median, in 9 of the 18 tested problem configurations. This is one more than the state-of-the art \smsego, but is equalled by the more exploitative adaption \smsegomu. As we also may expect, when measured by the \hpv measure the results are marginally more favourable to \smsego and \smsegomu, with \safmu being equivalent to the best performer on 9 optimisations equal to \smsegomu \fnote{These numbers are liable to change slightly with re-run results}.
 
-The hypothesis that search based on the mean prediction could offer improvements over \ei approaches appears to be borne out by the results. \smsegomu performs similarly well to \smsego, with few exceptions. There certainly seems to be no advantage to incorporating the uncertainty from the model. This however is not a true \ei method, and does not integrate the posterior prediction to get the expected improvement, but rather calculates the expected improvement to the dominated hypervolume based on the surrogate prediction. \safei is more similar to true \ei, though it uses a Monte-Carlo integration to estimate the model \ei. The performance of \safei is significantly worse than that of \safmu, never once outperforming the mean prediction version. This supports the ideas put forward by De Ath \etal \cite{death2019greed}, that in problems which are complex to model the fortuitous exploration resulting from low surrogate fidelity is sufficient to explore the parameter space.
-
-It appears that broadly speaking \safmu does not surpass the performance of \smsego significantly, but is as good in the majority of cases tested, though the nature of the  function being optimised remains a key factor in which optimiser performs best. 
-
+Tables \ref{tab: hv_results} and \ref{tab: igd_results} however, only considers a slice of the optimisation process, when the algorithms have largely converged. Figure \ref{fig: ranked_plots}\mnote{what are the two different panels showing? why does LHS start at 2 not 1 in the bottom panel?}\fnote{will fix this with new data} shows average ranking of each optimiser across all repeats and all problems in the experimental setup, at each step of the optimisation process. Where the difference between optimisations of similar rank have not been statistically significant the two were assigned the mid-point between ranks. From this it is more clear that over the broad range of test problems \smsegomu performs best in the later stages, whether measuring by $\igdp$ or \hpv, but \safmu is second best by both of these measurement methods, although it ranks similarly to \smsego. The nature of the results obtained by \safmu compared to \smsego are not dissimilar, though on average more non-dominated solutions were found with \safmu than with \smsego (\fnote{Put numbers here from updated results}), the solutions on the attainment front of an exemplar optimisation from the two methods is shown in figure \ref{fig: exemplar_pf_safmu_saf}, and the corresponding \hpv during optimisation in figure \ref{fig: exemplar_pf_sms_saf_hv}. 
+ 
 \begin{figure}[t]
 \begin{subfigure}[b]{\columnwidth}
          \centering
          \includegraphics[width=\columnwidth]{figures/_ranked_performance_plot_hv.pdf}
-        %  \caption{}
+         \caption{\hpv}
         %  \label{fig: ranked_hv_plot}
      \end{subfigure}
 \begin{subfigure}[b]{\columnwidth}
          \centering
          \includegraphics[width=\columnwidth]{figures/_ranked_performance_plot_igd.pdf}
-        %  \caption{}
+         \caption{$\igdp$}
         %  \label{fig: ranked_igf_plot}
      \end{subfigure}
-\caption{ranks}
+\caption{Average ranked performance of each optimiser against its equivalent starting conditions in the other optimisers considered.}
 \label{fig: ranked_plots}
 \end{figure}
 
-    
+The efficient infill criterion method, \mpoi is surpassed by \safmu in all optimisations, with the exception of WFG2 3$\nobj$ 6$\ndim$, for which there was broad equivalence across several optimisers. The alternative efficient method \parego appears to out-perform \safmu in the WFG2 problems also, but also in WFG1 $2\nobj$ $3\ndim$, otherwise it is surpassed by \safmu. Performance compared to \parego is less dominant. with cases of each method out-performing the other on certain problems, but over the course of all the optimisations tested \safmu ranks more highly over the majority of the optimisation. 
 
-\begin{table}[t]
-    \setlength{\tabcolsep}{2pt}
-    \sisetup{table-format=1.2e-1,table-number-alignment=center}
-    \resizebox{0.45\textwidth}{!}{%
-    \begin{tabular}{|l|l|l|}
-        \hline
-        Optimiser name & surrogate  & Comment\\
-        \hline
-        Saf ei & Multi & \ei version of SAF, as proposed in \cite{svenson2016multiobjective}. \\
-        Saf $\mu$ & Multi & Our proposed Optimiser. (See Alg. \ref{alg:ourAlg_pseudocde}) \\
-        \smsego: ei & Multi & Current state-of-the-art. \cite{ponweiser2008multiobjective} \\
-        \smsego: $\mu$ & Multi & Modification to current SOA to be more exploitative.\\
-        ParEgo & Mono & Efficient computation \cite{knowles2006parego}\\
-        MPoI & Multi & Benchmark for EMO over infill criteria approach \cite{rahat2017alternative}. \\
-        LHS & None & Baseline comparison to pseudo-uniform sampling of parameter space. \\
-        \hline
-    \end{tabular}}
-    \caption{Optimisation strategies to be compared}\label{tab1}
-    \label{table:alg_table}
-\end{table}
+All optimisers performed poorly on WFG2, with the majority of the Pareto Front left unexplored. \parego optimised WFG2 relatively well, compared to the other methods, but many of the surrogate models were beaten by the \lhs benchmark here. It is worth noting that WFG2 is the only problem here with a discontinuous Pareto front, and also the only problem in which the boundary between the attainable and unattainable objective space regions, on which the Pareto front lies, extends into the area dominated by the Pareto front. This means much of the objective space, in between the acquired evaluations, and favoured by the infill criteria methods may unattainable. This is a feature which distinguishes this function from the others tested here but could be a factor in the poorer performance by optimisers reliant on infill criteria.\fnote{Not sure this makes sense. We should talk about it and see if you both think it is relevant.} This is also the only function tested with a discontinuous Pareto front, and there are disjointed local minima along this Pareto front. \hpv and $\igdp$ scores were largely dependant on how many of these basins were found during optimisation. %In all other problems, any point dominated by the current attainment set, is guaranteed to be also attainable. This is not the case for WFG2. 
 
+\begin{figure}[t]
+\begin{subfigure}[b]{0.45\columnwidth}
+         \centering
+         \includegraphics[width=\columnwidth]{figures/_comparison_attainmenPoints_sms_saf.pdf}
+         \caption{}
+         \label{fig: exemplar_pf_sms_saf}
+     \end{subfigure}
+\begin{subfigure}[b]{0.45\columnwidth}
+         \centering
+         \includegraphics[width=\columnwidth]{figures/_comparison_attainmenPoints_safei_safmu.pdf}
+         \caption{}
+         \label{fig: exemplar_pf_safmu_saf}
+     \end{subfigure}
+\begin{subfigure}[b]{\columnwidth}
+         \centering
+         \includegraphics[width=\columnwidth]{figures/wfg6_3obj_6dim_hv_plot.pdf}
+         \caption{}
+         \label{fig: exemplar_pf_sms_saf_hv}
+     \end{subfigure}
+\caption{Exemplar optimisation, these will change to updated results. Just included for idea of space}
+\label{fig: exemplar_pf}
+\end{figure}
 
-% The WFG problems are intentionally constructed to cover significantly different numerical ranges in the domains of each of their objectives. This presents a problem to the DHV\mnote{has this acronym been defined?} measurement, as the computation of the HV depends heavily on the scales of the objectives. A common solution to this is to optimise a scaled version of the WFG problems where the ranges of each dimension have been normalised, and to set the reference point for the DHV measurement within this scaled objective space, equidistant from the origin. To do this is to assume prior knowledge about the objective function, information which is not typically available in real-world problems. \smsego uses the dominated hypervolume measurement in its process of assessing candidate solutions, and to scale the objectives a priori and provide an ideally positioned reference point is not realistic in a real application. Furthermore setting the DHV reference point for \smsego identically to that against which it is assessed will inevitably give \smsego an unfair advantage, when assessed by the DHV criterion. Instead we will require \smsego to set its own reference point and scale the objectives accordingly. This will be done dynamically during the optimisation in order to normalise the range of each objective present in the non-dominated set of observations. 
-
+More often than not, the \smsegomu method, which uses the \gp posterior mean prediction, rather than the LCB\fnote{needs defining in \ref{section:related_work}} produces superior results. both in \hpv and $\igdp$ measures, and \smsegomu is the highest raking performer on average over the majority of the optimisation process. \safmu is also more often than not significantly better than its \ei counterpart \safei, with \safei only bettering it in a single test problem , according to \hpv and in this problem \safmu had a better $\igdp$ score.  
 
 
 \subsection{Conclusion}
 When optimising expensive, multi-objective problems efficient use of objective evaluations is critical to convergence within the constraining budget. Current state-of-the-art methods for optimising such problems in few evaluations rely on expensive hypervolume computation which can itself become prohibitively costly as the number of objectives is scaled, and the number of non-dominated solutions in the attainment surface increases. The state-of-the art method is benchmarked on a comprehensive set of synthetic test problems, and an optimisation method based on a cheap, exploitative, \maximin distance infill criteria method from the attainment surface is presented and shown to be similarly effective across the test problems. The leading efficient methods are also tested, and surpassed in the majority of tested functions by our proposed approach. 
 
-Benchmarking on the same set of problems we further show that approaches which leverage the uncertainty in the surrogate posterior prediction offer no improvement over simple mean prediction when it comes to complex EMO problems, and in the majority of cases, optimisations which use pure mean prediction are more effective. This expands the scope of effective surrogate models for efficient Bayesian Optimisation style surrogate approaches to MOP's, to methods which may be better able to model mean prediction but do not provide the posterior uncertainty estimates that come with A \gp surrogate.
+Optimiser performance is shown to vary quite widely between different problems, with certain examples optimised poorly by all those methods tested. Exploitative methods are frequently shown to suffer no detriment compared to alternatives, which leverage the posterior prediction uncertainty, in the majority of cases tested, suggesting that deploying surrogates which are better able to model the broader ranges of objective functions, without providing predictive uncertainty may yield better results. 
+
 
 % \section{Definitions required}
 % \begin{enumerate}

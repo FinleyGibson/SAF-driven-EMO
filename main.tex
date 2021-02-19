@@ -430,7 +430,7 @@ evaluation is found, as usual in BO, by maximising the acquisition function
     $\bff_t \gets \bff(\bx_t)$ \label{alg:expensive_DSAF} \algremark{Expensively evaluate $\bx_t$}
     $\data  \gets \data \cup \{(\bx_t, \bff_t )\}$\algremark{Augment data}
  }
- $\{\attainmentset, \attainmentfront\} \gets \data$ \algremark{Select non-dominated evaluations \eqref{eqn: Attainment_set}}
+ $\{\attainmentset, \attainmentfront\} \gets \texttt{nondom}(\data)$ \algremark{Select non-dominated} %evaluations} %\eqref{eqn: Attainment_set}}
  \Output{$\{\attainmentset, \attainmentfront\}$}
  \caption{\safmu} 
  \label{alg:ourAlg_pseudocde} 
@@ -440,7 +440,8 @@ evaluation is found, as usual in BO, by maximising the acquisition function
 \section{Experimental evaluation}
 \label{sec:exper-eval}
 \subsection{Process}
-In this section an analysis is conducted of the performance of \safmu over 150 evaluations of a set of challenging, synthetic MOPs. For comparison we benchmark the state-of-the-art \smsego \cite{ponweiser2008multiobjective} and the competitive, yet computationally efficient \parego \cite{knowles2006parego}. We also compare the, cheap-to-evaluate minimum probability of improvement (\mpoi) infill criteria proposed by Rahat \etal \cite{rahat2017alternative}. For \smsego we formulate the optimiser including the later improvements to the treatment of the objective space dominated by the attainment surface described by Wagner \etal \cite{wagner2010expected}, and the prior knowledge of the objective space required to set the reference point for the hypervolume calculation is assumed to be unknown. Instead the reference point $\rp$ is updated at each evaluation to the maximum value observed in each objective by the current attainment front, plus an offset of $1$, as in the original work $\rp = \max(\attainmentfront)+1$\fnote{I dont think this is clear enough, need to show np.axrgmax($\attainmentfront$, axis=0)}. In order to test the second part of our hypothesis, that more exploitative search will be beneficial, we also include the \ei based \maximin model proposed by Svenson and Santner  \cite{svenson2016multiobjective}, (hereby denoted as \safei), and also a version of \smsego, where the uncertainty from the \gp is ignored, instead using mean prediction only, with no correction for $\epsilon$ (denoted \smsegomu), these strategies are listed in table \ref{table:alg_table}\fnote{I don't think this table is really necesary. Left it in for now to gauge your opinions.}.
+In this section an analysis is conducted of the performance of \safmu over 150 evaluations of a set of challenging, synthetic MOPs. For comparison we benchmark the state-of-the-art \smsego \cite{ponweiser2008multiobjective} and the competitive, yet computationally efficient \parego \cite{knowles2006parego}. We also compare the, cheap-to-evaluate minimum probability of improvement (\mpoi) infill criteria proposed by Rahat \etal \cite{rahat2017alternative}. For \smsego we formulate the optimiser including the later improvements to the treatment of the objective space dominated by the attainment surface described by Wagner \etal \cite{wagner2010expected}, and the prior knowledge of the objective space required to set the reference point for the hypervolume calculation is assumed to be unknown. Instead the reference point $\rp$ is updated at each evaluation to the maximum value observed in each objective by the current attainment front, plus an offset of $1$, as in the original work $R_m = \max_{\bff \in \attainmentfront}(f_m) +1$. %\fnote{I dont think this is clear enough, need to show np.axrgmax($\attainmentfront$, axis=0)}. 
+In order to test the second part of our hypothesis, that more exploitative search will be beneficial, we also include the \ei based \maximin model proposed by Svenson and Santner  \cite{svenson2016multiobjective}, (hereby denoted as \safei), and also a version of \smsego, where the uncertainty from the \gp is ignored, instead using mean prediction only, with no correction for $\epsilon$ (denoted \smsegomu), these strategies are listed in table \ref{table:alg_table}\fnote{I don't think this table is really necesary. Left it in for now to gauge your opinions.}.
 
 \begin{table}[t]
     \setlength{\tabcolsep}{2pt}
@@ -501,7 +502,7 @@ The chosen objective functions for the benchmark tests are a subset the Walking 
         \end{tabular}}
         \caption{Objective functions to be assessed}\label{tab: f_table}
 \end{table}
-\footnotetext{Multi-modal in only the first objective $f^{1}$, uni-modal in $f^{2} \cdots f^{\nobj}$.}
+\footnotetext{Multi-modal in only the first objective $f_{1}$, uni-modal in $f_{2} \cdots f_{\nobj}$.}
 
 Two metrics are used to quantify the performance of each optimiser. The first is the \hpv measure, this is a commonly used means of measuring convergence toward the Pareto front, but as it is also the principal computation behind the $\mathcal{S}$-metric in \smsego. As such we also compare measurements of the Inverted Generational Distance plus (\igd) \cite{ishibuchi2015modified} in order to identify any undue bias in favour of the \smsego and \smsegomu methods. $\igdp$ is calculated as:
 \begin{equation}

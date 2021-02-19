@@ -54,16 +54,16 @@
 \DeclarePairedDelimiter\abs{\lvert}{\rvert}%
 \DeclareMathOperator*{\evaluatedx}{\bX}
 \DeclareMathOperator*{\paretofront}{\mathcal{P}}
-\DeclareMathOperator*{\paretoset}{\evaluatedx_{\mathcal{P}}}
-\DeclareMathOperator*{\attainmentfront}{\mathcal{A}}
-\DeclareMathOperator*{\attainmentset}{\evaluatedx_{\mathcal{A}}}
-\DeclareMathOperator*{\ninitialevaluations}{N}
-\DeclareMathOperator*{\nevaluations}{m}
-\DeclareMathOperator*{\nbudget}{B}
-\DeclareMathOperator*{\parameterspace}{\Omega}
-\DeclareMathOperator*{\ndim}{d}
-\DeclareMathOperator*{\nobj}{M}
-\DeclareMathOperator*{\rp}{\mathbf{R}}
+\newcommand{\paretoset}{\evaluatedx_{\mathcal{P}}}
+\newcommand{\attainmentfront}{\mathcal{A}}
+\newcommand{\attainmentset}{\evaluatedx_{\mathcal{A}}}
+\newcommand{\ninitialevaluations}{N}
+\newcommand{\nevaluations}{m}
+\newcommand{\nbudget}{B}
+\newcommand{\parameterspace}{\Omega}
+\newcommand{\ndim}{d}
+\newcommand{\nobj}{M}
+\newcommand{\rp}{\mathbf{R}}
 
 
 \DeclareMathOperator*{\sig}{sig}
@@ -139,6 +139,7 @@
 \newcommand{\xnext}{\bx'}
 \newcommand{\data}{\mathcal{D}}
 \newcommand{\FIXME}[1]{[\textcolor{red}{\textbf{FIXME} \textsl{#1}]}}
+\newcommand{\rmenote}[2][\textcolor{magenta}{\dagger}]{$#1$\marginpar{\color{magenta}\raggedright\tiny$#1$ #2}}
 \newcommand{\mnote}[2][\textcolor{red}{\dagger}]{$#1$\marginpar{\color{red}\raggedright\tiny$#1$
     #2}}
 \newcommand{\fnote}[2][\textcolor{teal}{\dagger}]{$#1$\marginpar{\color{teal}\raggedright\tiny$#1$
@@ -152,7 +153,7 @@
 \begin{document}
 
 %
-\title{Multi-objective Bayesian optimisation using an exploitative summary attainment front acquisition function}
+\title{Multi-objective Bayesian optimisation using an exploitative  attainment front acquisition function}
 
 %Exploitative and Bayesian multi-objective optimisation: a summary attainment front acquisition function
 %
@@ -197,11 +198,21 @@ Expensive optimisation, Bayesian optimisation, infill criteria, acquisition func
 
 
 \section{Introduction}
-The process of optimising black-box functions relies exclusively on querying the underlying objective function in order to advance the understanding of the parameter objective-space mapping of, and convergence toward, an optimal solution. During the optimisation process a balance must be struck between the exploitation of the function as currently understood in order to find good solutions, and further exploration of the unknown regions of its landscape in order to advance this understanding. Extensive work has gone into theorising how this balance should be managed, particularly in cases where there is a high cost associated with querying the underlying objective. In such cases careful management of this balance is considered essential if a suitable solution is to be found as efficiently as possible. Bayesian optimisation \cite{jones1998efficient} has emerged as an effective means of solving such problems, and has been widely applied to many problems with success.
+The process of optimising black-box functions relies exclusively on querying the underlying objective function in order to advance the understanding of the parameter objective-space mapping of, and convergence toward, an optimal solution. During the optimisation process a balance must be struck between the exploitation of the function as currently understood in order to find good solutions, and further exploration of the unknown regions of its landscape in order to advance this understanding. Extensive work has gone into theorising how this balance should be managed, particularly in cases where there is a high cost associated with querying the underlying objective. In such cases careful management of this balance is considered essential if a suitable solution is to be found as efficiently as possible. Bayesian optimisation \cite{jones1998efficient}, which constructs a probabilistic surrogate model of the objective function, has emerged as an effective means of solving such problems, and has been widely applied to many problems with success.
 
-In the field of multi-objective optimisation (MO), efforts have been made to employ similar strategies to those used for single objective optimisation, but accurately modelling the multi-dimensional objective space is more challenging, and many techniques used in single-objective optimisation require complex volume measurement and integration, the computational complexity of which scales poorly in the higher dimensional objective spaces associated with MO. One widely used technique is the computation of the expected improvement (\ei) to manage the exploitation/exploration trade-off. However, recent work has shown that in single objective problems with high-dimensional parameter spaces, the low fidelity between the commonly used surrogate models and the underlying function reduces the need to actively explore the function. Instead purely exploitative methods have been demonstrated to outperform methods which balance the explore/exploit trade-off, when the fidelity between the surrogate and true function is low \cite{death2019greed}. With this in mind we look apply to this exploitative approach to the multi-objective domain, where we believe the increased complexity of modelling problems with multi-dimensional outputs will enjoy similar benefits of an exploitative approach. 
+In the field of multi-objective optimisation (MO), efforts have been made to employ similar strategies to those used for single objective optimisation, but accurately modelling the multi-dimensional objective space is more challenging, and many techniques used in single-objective optimisation require complex volume measurement and integration, the computational complexity of which scales poorly in the higher dimensional objective spaces associated with MO. One widely used technique is to use the expected improvement (\ei)  \cite{jones1998efficient} to manage the exploitation/exploration trade-off. However, recent work has shown that in single objective problems with high-dimensional parameter spaces, the low fidelity between the commonly used surrogate models and the underlying function reduces the need to actively explore the function. Instead purely exploitative methods have been demonstrated to outperform methods which balance the explore/exploit trade-off, when the fidelity between the surrogate and true function is low \cite{death2019greed}. With this in mind we investigate the application of  this exploitative approach to the multi-objective domain, where we anticipate the increased complexity of modelling problems with multi-dimensional outputs will enjoy similar benefits of an exploitative approach. 
 
-In this paper we address a particular set of mutli-objective problems (MOPs), for which some cost associated with the evaluation of the objectives for a set of parameters is significant, and restricts the number of queries of the objective function can be made. This can be because either each objective is independently expensive and requires a separate evaluation or, more commonly, all objectives are jointly evaluated by a single expensive process. In such MOPs the goal of the optimisation process is to find a suitable solution in as few evaluations of the objective function(s) as possible. The advent of large-scale simulation, and optimisation problems that require physical experimentation to evaluate an objective function has brought this class of Efficient multi-objective optimisation problems (EMOPs) to the fore as an important area of research. This class of problem is common in real-world applications, particularly in the fields of engineering and computer modelling. For example, when engineering a component based on some design parameters, performance evaluation of a newly proposed design may require making and testing the component, incurring both time and material costs \cite{fang2017design}. Alternately, computationally expensive processes such as fluid dynamic simulation or machine learning model evaluation, often have high computational costs associated with them and can take hours or even days to process \cite{huband2005scalable}. This renders optimiser classes such as Multi-Objective Evolutionary Algorithms\cite{tanabe2017benchmarking,coello2007evolutionary} or Multi-Objective Genetic Algorithms\cite{tamaki1996multi}, for which a large number of objective evaluations are required, unsuitable. 
+In this paper we address a particular set of mutli-objective problems (MOPs), for which some cost associated with the evaluation of the objectives for a set of parameters is significant, and restricts the number of queries of the objective function can be made. This can be because either each objective is independently expensive and requires a separate evaluation or, more commonly, all objectives are jointly evaluated by a single expensive process. In such MOPs the goal of the optimisation process is to find a suitable solution in as few evaluations of the objective function(s) as possible. The advent of large-scale simulation, and optimisation problems that require physical experimentation to evaluate an objective function has brought this class of efficient multi-objective optimisation problems (EMOPs) to the fore as an important area of research.\rmenote{Could give some more references to work in this area if room} This class of problem is common in real-world applications, particularly in the fields of engineering and computer modelling. For example, when engineering a component based on some design parameters, performance evaluation of a newly proposed design may require making and testing the component, incurring both time and material costs \cite{fang2017design}. Alternatively, computationally expensive processes such as fluid dynamic simulation or machine learning model evaluation, often have high computational costs associated with them and can take hours or even days to process \cite{huband2005scalable}. This renders optimiser classes such as Multi-Objective Evolutionary Algorithms\cite{tanabe2017benchmarking,coello2007evolutionary} or Multi-Objective Genetic Algorithms\cite{tamaki1996multi}, for which a large number of objective evaluations are required, unsuitable.
+
+\rmenote{Could have more of an introduction to the paper.  Main contributions at least are needed}
+The principal contributions of this paper are:
+\begin{itemize}
+\item We propose a novel infill criterion based on the distance to the summary attainment front (SAF).
+\item Extensive empirical evaluation  on the Walking Fish Group problem set \cite{huband2005scalable} shows that the SAF infill criterion yields optimisers with state of the art performance with low computational complexity.
+\item We show empirically that exploiting the mean prediction of the surrogate model is more often than not superior to utilising the deliberate exploration induced by accounting for the uncertainty in the surrogate's estimate.  \end{itemize}
+
+In the following section we summarise the Bayesian optimisation approach, particularly in the multi-objective context.  In section \ref{section:our_method} we propose the novel infill criterion based on the summary attainment front, together with an exploitive version of the method.  Experimental evaluation is described in section \ref{section:our_method}.  The paper concludes in section \ref{sec:conclusion}.
+
 
 \section{Background}
 \subsection{Bayesian Optimisation}\label{section:background_BayesianOptimisation}
@@ -234,7 +245,8 @@ Bayesian optimisation (BO) is a form of efficient global optimisation (EGO), whi
   \alpha(\mathbf{x}; \theta)$ \label{alg:opt-alpha} \algremark{Maximise acquisition function}
   $ f_t \gets f(\bx_t)$ \label{alg:expensive} \algremark{Expensively evaluate $\bx_t$}
   $\data \gets \data \cup \{(\bx_t, f_t)\}$ \algremark{Augment data}}
-  \Output{$\bx_t \quad \quad \underset{t\in 1:\nbudget}{\argmin} f_{1:\nbudget}$}
+  %\Output{$\bx_t \quad \quad \underset{t\in 1:\nbudget}{\argmin} f_{1:\nbudget}$}
+  \Output{$ \argmin_{\bx_i \in \data} \{f(\bx_i)\}$}
 \caption{Bayesian optimisation}
 \label{alg:BO}
 \end{algorithm}
@@ -408,8 +420,9 @@ evaluation is found, as usual in BO, by maximising the acquisition function
 
 
 \section{Experimental evaluation}
+\label{sec:exper-eval}
 \subsection{Process}
-In this section an analysis is conducted of the performance of \safmu over 150 evaluations of a set of challenging, synthetic MOPs. For comparison we benchmark the state-of-the-art \smsego \cite{ponweiser2008multiobjective} and thec ompetitive, yet computationally efficient \parego \cite{knowles2006parego}. We also compare the, cheap-to-evaluate minimum probability of improvement (\mpoi) infill criteria proposed by Rahat \etal \cite{rahat2017alternative}. For \smsego we formulate the optimiser including the later improvements to the treatment of the objective space dominated by the attainment surface described by Wagner \etal \cite{wagner2010expected}, and the prior knowledge of the objective space required to set the reference point for the hypervolume calculation is assumed to be unknown. Instead the reference point $\rp$ is updated at each evaluation to the maximum value observed in each objective by the current attainment front, plus an offset of $1$, as in the original work $\rp = \max(\attainmentfront)+1$\fnote{I dont think this is clear enough, need to show np.axrgmax($\attainmentfront$, axis=0)}. In order to test the second part of our hypothesis, that more exploitative search will be beneficial, we also include the \ei based \maximin model proposed by Svenson and Santner  \cite{svenson2016multiobjective}, (hereby denoted as \safei), and also a version of \smsego, where the uncertainty from the \gp is ignored, instead using mean prediction only, with no correction for $\epsilon$ (denoted \smsegomu), these strategies are listed in table \ref{table:alg_table}\fnote{I don't think this table is really necesary. Left it in for now to gauge your opinions.}.
+In this section an analysis is conducted of the performance of \safmu over 150 evaluations of a set of challenging, synthetic MOPs. For comparison we benchmark the state-of-the-art \smsego \cite{ponweiser2008multiobjective} and the competitive, yet computationally efficient \parego \cite{knowles2006parego}. We also compare the, cheap-to-evaluate minimum probability of improvement (\mpoi) infill criteria proposed by Rahat \etal \cite{rahat2017alternative}. For \smsego we formulate the optimiser including the later improvements to the treatment of the objective space dominated by the attainment surface described by Wagner \etal \cite{wagner2010expected}, and the prior knowledge of the objective space required to set the reference point for the hypervolume calculation is assumed to be unknown. Instead the reference point $\rp$ is updated at each evaluation to the maximum value observed in each objective by the current attainment front, plus an offset of $1$, as in the original work $\rp = \max(\attainmentfront)+1$\fnote{I dont think this is clear enough, need to show np.axrgmax($\attainmentfront$, axis=0)}. In order to test the second part of our hypothesis, that more exploitative search will be beneficial, we also include the \ei based \maximin model proposed by Svenson and Santner  \cite{svenson2016multiobjective}, (hereby denoted as \safei), and also a version of \smsego, where the uncertainty from the \gp is ignored, instead using mean prediction only, with no correction for $\epsilon$ (denoted \smsegomu), these strategies are listed in table \ref{table:alg_table}\fnote{I don't think this table is really necesary. Left it in for now to gauge your opinions.}.
 
 \begin{table}[t]
     \setlength{\tabcolsep}{2pt}
@@ -531,7 +544,7 @@ Measurements using \igd rely on a set of reference points $\pigdref$ on the prob
 \resizebox{\columnwidth}{!}{%
 \import{tables/}{hv_table_3.tex}}
 \end{subtable}
-\caption{D\hpv after 150 function evaluations.}
+\caption{\hpv after 150 function evaluations.}
 \label{tab: hv_results}
 \end{table}
 
@@ -580,7 +593,7 @@ Tables \ref{tab: hv_results} and \ref{tab: igd_results} however, only considers 
 \label{fig: ranked_plots}
 \end{figure}
 
-The efficient infill criterion method, \mpoi is surpassed by \safmu in all optimisations, with the exception of WFG2 3$\nobj$ 6$\ndim$, for which there was broad equivalence across several optimisers. The alternative efficient method \parego appears to out-perform \safmu in the WFG2 problems also, but also in WFG1 $2\nobj$ $3\ndim$, otherwise it is surpassed by \safmu. Performance compared to \parego is less dominant. with cases of each method out-performing the other on certain problems, but over the course of all the optimisations tested \safmu ranks more highly over the majority of the optimisation. 
+The efficient infill criteri<on method, \mpoi is surpassed by \safmu in all optimisations, with the exception of WFG2 3$\nobj$ 6$\ndim$, for which there was broad equivalence across several optimisers. The alternative efficient method \parego appears to out-perform \safmu in the WFG2 problems also, but also in WFG1 $2\nobj$ $3\ndim$, otherwise it is surpassed by \safmu. Performance compared to \parego is less dominant. with cases of each method out-performing the other on certain problems, but over the course of all the optimisations tested \safmu ranks more highly over the majority of the optimisation. 
 
 All optimisers performed poorly on WFG2, with the majority of the Pareto Front left unexplored. \parego optimised WFG2 relatively well, compared to the other methods, but many of the surrogate models were beaten by the \lhs benchmark here. It is worth noting that WFG2 is the only problem here with a discontinuous Pareto front, and also the only problem in which the boundary between the attainable and unattainable objective space regions, on which the Pareto front lies, extends into the area dominated by the Pareto front. This means much of the objective space, in between the acquired evaluations, and favoured by the infill criteria methods may unattainable. This is a feature which distinguishes this function from the others tested here but could be a factor in the poorer performance by optimisers reliant on infill criteria.\fnote{Not sure this makes sense. We should talk about it and see if you both think it is relevant.} This is also the only function tested with a discontinuous Pareto front, and there are disjointed local minima along this Pareto front. \hpv and $\igdp$ scores were largely dependant on how many of these basins were found during optimisation. %In all other problems, any point dominated by the current attainment set, is guaranteed to be also attainable. This is not the case for WFG2. 
 
@@ -610,7 +623,8 @@ All optimisers performed poorly on WFG2, with the majority of the Pareto Front l
 More often than not, the \smsegomu method, which uses the \gp posterior mean prediction, rather than the LCB\fnote{needs defining in \ref{section:related_work}} produces superior results. both in \hpv and $\igdp$ measures, and \smsegomu is the highest raking performer on average over the majority of the optimisation process. \safmu is also more often than not significantly better than its \ei counterpart \safei, with \safei only bettering it in a single test problem , according to \hpv and in this problem \safmu had a better $\igdp$ score.  
 
 
-\subsection{Conclusion}
+\section{Conclusion}
+\label{sec:conclusion}
 When optimising expensive, multi-objective problems efficient use of objective evaluations is critical to convergence within the constraining budget. Current state-of-the-art methods for optimising such problems in few evaluations rely on expensive hypervolume computation which can itself become prohibitively costly as the number of objectives is scaled, and the number of non-dominated solutions in the attainment surface increases. The state-of-the art method is benchmarked on a comprehensive set of synthetic test problems, and an optimisation method based on a cheap, exploitative, \maximin distance infill criteria method from the attainment surface is presented and shown to be similarly effective across the test problems. The leading efficient methods are also tested, and surpassed in the majority of tested functions by our proposed approach. 
 
 Optimiser performance is shown to vary quite widely between different problems, with certain examples optimised poorly by all those methods tested. Exploitative methods are frequently shown to suffer no detriment compared to alternatives, which leverage the posterior prediction uncertainty, in the majority of cases tested, suggesting that deploying surrogates which are better able to model the broader ranges of objective functions, without providing predictive uncertainty may yield better results. 

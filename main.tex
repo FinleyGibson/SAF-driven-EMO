@@ -52,13 +52,13 @@
 %% MATHS COMMANDS
 % for algorithms
 \DeclarePairedDelimiter\abs{\lvert}{\rvert}%
-\DeclareMathOperator*{\evaluatedx}{\bX}
-\DeclareMathOperator*{\paretofront}{\mathcal{P}}
-\newcommand{\paretoset}{\evaluatedx_{\mathcal{P}}}
+\newcommand{\evaluatedx}{\bX}
+\newcommand{\paretofront}{\mathcal{F}}
+\newcommand{\paretoset}{\mathcal{P}}
 \newcommand{\attainmentfront}{\mathcal{A}}
 \newcommand{\attainmentset}{\evaluatedx_{\mathcal{A}}}
 \newcommand{\ninitialevaluations}{N}
-\newcommand{\nevaluations}{m}
+\newcommand{\nevaluations}{t}
 \newcommand{\nbudget}{B}
 \newcommand{\parameterspace}{\Omega}
 \newcommand{\ndim}{d}
@@ -216,7 +216,7 @@ In the following section we summarise the Bayesian optimisation approach, partic
 
 \section{Background}
 \subsection{Bayesian Optimisation}\label{section:background_BayesianOptimisation}
-Bayesian optimisation (BO) is a form of efficient global optimisation (EGO), which searches for the global optimal solution to an objective function $f(\mathbf{x})$ for  $f: \parameterspace \subset \mathbb{R}^{\ndim} \mapsto \mathbb{R}$, while making as few evaluations of the objective function as possible. In BO, in order to limit the number of evaluations required of the true objective function,  a small number of $\ninitialevaluations$ initial evaluations are made, and a probabilistic surrogate model is then generated from these evaluations. This surrogate model, which should be cheap to evaluate, can then be used to predict the efficacy of subsequent candidate solutions without the need to frequently evaluate $f$. 
+Bayesian optimisation (BO) is a form of efficient global optimisation (EGO), which searches for the global optimal solution to an objective function $f(\mathbf{x})$ for  $f: \parameterspace \subset \mathbb{R}^{\ndim} \mapsto \mathbb{R}$, while making as few evaluations of the objective function as possible. In BO, in order to limit the number of evaluations required of the true objective function,  a small number of $\ninitialevaluations$ initial evaluations are made, and a probabilistic surrogate model is then generated from these evaluations. This surrogate model, which should be cheap to evaluate, can then be used to predict the value of subsequent candidate solutions without the need to frequently evaluate $f$.   Unlike other surrogate modelling methods, BO constructs a probabilistic surrogate model which allows the model's uncertainty as well as its mean predication to be accounted when choosing the next location for evaluation.
 
 \begin{algorithm}[t]
   \SetAlgoLined
@@ -242,17 +242,17 @@ Bayesian optimisation (BO) is a form of efficient global optimisation (EGO), whi
   \For{$t = \ninitialevaluations+1\xrightarrow{}\nbudget$ \do}{
   $ \theta \gets \text{train} \;\mathcal{GP}(\data)$ \label{alg:train}\\
   $\bx_t \gets \underset{\mathbf{x}\in \parameterspace}{\argmax} \:
-  \alpha(\mathbf{x}; \theta)$ \label{alg:opt-alpha} \algremark{Maximise acquisition function}
+  \alpha(\mathbf{x}; \theta)$ \label{alg:opt-alpha} \algremark{Maximise acquisition fcn}
   $ f_t \gets f(\bx_t)$ \label{alg:expensive} \algremark{Expensively evaluate $\bx_t$}
   $\data \gets \data \cup \{(\bx_t, f_t)\}$ \algremark{Augment data}}
   %\Output{$\bx_t \quad \quad \underset{t\in 1:\nbudget}{\argmin} f_{1:\nbudget}$}
-  \Output{$ \argmin_{\bx_i \in \data} \{f(\bx_i)\}$}
+  \Output{$ \argmin_{\bx_t\in \data} \{f(\bx_t)\}$}
 \caption{Bayesian optimisation}
 \label{alg:BO}
 \end{algorithm}
 
 The process of BO, summarised in Algorithm \ref{alg:BO}, involves first selecting a set of $\ninitialevaluations$ initial candidate solutions, usually via Latin hypercube sampling (LHS) \cite{mckay2000comparison}, and evaluating the objective function for each of these to produce a set $\mathcal{D} = \{ (\bx_t, f_t \triangleq f(\bx_t) )\}_{t=1}^{\ninitialevaluations}$; lines \ref{alg:initial-start}-\ref{alg:initial-end} in Algorithm \ref{alg:BO}. A probabilistic, surrogate model is then fitted to these observations, for which  Gaussian processes (\gp) are commonly used; see \cite{rasmussen2003gaussian} for a comprehensive introduction.
-The \gp describes the current belief about the form of the objective function, modelling it as a set of random variables with a joint Gaussian distribution, and the predictive probability distribution of $\hat{f}(\bx)$ at a location $\bx$ is a normal distribution:
+The \gp describes the current belief about the objective function, modelling it as a set of random variables with a joint Gaussian distribution.  The predictive probability distribution of $\hat{f}(\bx)$ at a location $\bx$ is a normal distribution:
 \begin{equation}\label{eqn: P(f_t+1)}
 P\big(\hat{f}(\mathbf{x}) \given \mathbf{x}, \mathcal{D}, \theta \big) = 
 \mathcal{N}\big(\bmu(\mathbf{x}), \sigma^2(\mathbf{x})\bI\big)
@@ -263,27 +263,33 @@ where
 \label{eqn: sigma}
 \sigma^2(\mathbf{x}) &= \kappa(\mathbf{x}, \mathbf{x}) - \boldsymbol{\kappa}(\mathbf{x}, \evaluatedx)^{\top}K^{-1} \boldsymbol{\kappa}(\evaluatedx, \mathbf{x}).
 \end{align}
-Where $\evaluatedx$ is the $\ndim$ by $\nevaluations$ matrix of locations at which $f(\bx)$ has
-been previously evaluated, $\bphi = (\bx_1, \bx_2, \ldots, \bx_{\nevaluations})$\fnote{check $\nevaluations$ correct here?}.
+Here $\evaluatedx$ is the $\ndim$ by $\nevaluations$ matrix of locations at which $f(\bx)$ has
+been previously evaluated, $\bphi = (\bx_1, \bx_2, \ldots, \bx_{\nevaluations})$.
 $\kappa(\mathbf{x}, \mathbf{x}')$ is a predefined
 covariance function, or  \textit{kernel}, between $\mathbf{x}$ and
 $\mathbf{x}'$, and  $K$ is the covariance matrix comprised of all
 covariances $\kappa(\mathbf{x}, \mathbf{x}') \; \forall \: \mathbf{x},
 \mathbf{x}'\in \evaluatedx$. A vector of the covariances between
-$\mathbf{x}$ and each of the $M$ locations in $\evaluatedx$ is denoted
-$\boldsymbol{\kappa}(\mathbf{x}, \evaluatedx)\in \mathbb{R}^{M}$ and
-similarly the vector of covariances between each of the $M$ locations in
+$\mathbf{x}$ and each of the $t$ locations in $\evaluatedx$ is denoted
+$\boldsymbol{\kappa}(\mathbf{x}, \evaluatedx)\in \mathbb{R}^{t}$ and
+similarly the vector of covariances between each of the $t$ locations in
 $\evaluatedx$ and $\mathbf{x}$ is denoted $\boldsymbol{\kappa}(\evaluatedx,
-\mathbf{x}) \in \mathbb{R}^{M}$. The parameters of the covariance function
+\mathbf{x}) \in \mathbb{R}^{t}$. The parameters of the covariance function
 (and any noise model) are denoted by $\theta$, and these are learned on receipt of each new $(\bx, f(\bx))$ pair by maximising the likelihood of the data \cite{rasmussen2003gaussian}; Algorithm \ref{alg:BO} line \ref{alg:train}. 
 
 
 Determination of how desirable a new evaluation of the objective function
-would be at a new location is achieved through application of an acquisition function $\alpha(\mathbf{x};  \theta)$, which balances the exploitation of locations predicted by the surrogate (with parameters $\theta$) to be good with high confidence, with the exploration of regions that have high uncertainty and might therefore contain the optimum. Maximisation of the acquisition function (Algorithm \ref{alg:BO} line \ref{alg:opt-alpha}) yields the next location $\bx'$ at which to evaluate the real objective function: 
+would be at a new location is achieved via an acquisition function $\alpha(\mathbf{x};  \theta)$, which balances the exploitation of locations predicted by the surrogate (with parameters $\theta$) to be good with high confidence, with the exploration of regions that have high uncertainty and might therefore contain the optimum. Maximisation of the acquisition function (Algorithm \ref{alg:BO} line \ref{alg:opt-alpha}) yields the next location $\bx'$ at which to evaluate the real objective function: 
 \begin{equation}\label{eqn: argmax_alpha}
    \bx' = \underset{\mathbf{x} \in \Omega}{\argmax}\:\alpha(\mathbf{x};  \theta).
 \end{equation}
-The acquisition function can be cheaply optimised using methods such as an evolutionary algorithm without the need for repeated evaluation of the expensive objective function. Several broadly applicable acquisition functions have been specified, typically based on expected improvement or probability of improvement  measures \cite{jones1998efficient,shahriari2015taking} and \ei has been shown to converge at a near optimal rate \cite{bull2011convergence}. This process of fitting a surrogate, and optimisation of the acquisition function is repeated,  to expand $\mathcal{D}$, iteratively until a good solution is found and some stopping criteria is satisfied or the computational budget is exhausted.
+The acquisition function can be cheaply optimised using methods such as an evolutionary algorithm without the need for repeated evaluation of the expensive objective function. Several  acquisition functions have been proposed,
+including probability of improvement (PI) \cite{kushner:ego},
+optimistic strategies such as UCB \cite{srinivas:ucb:2010},
+expected improvement \cite{jones1998efficient}, 
+$\epsilon$-greedy strategies \cite{bull2011convergence, death2019greed},
+and information-theoretic approaches, e.g. \cite{scott:kg:2011,  ru:fitbo:2018}.  
+Under certain conditions \ei and UCB have been shown to converge \cite{bull2011convergence, srinivas:ucb:2010}. This process of fitting a surrogate, and optimisation of the acquisition function and evaluation of $f$ is repeated,  expanding $\mathcal{D}$,  until a good solution is found and some stopping criteria is satisfied or the computational budget is exhausted.
 
 \subsection{Multi-objective Bayesian Optimisation}\label{section:background_MOPs}
 In MOPs there is not one single criterion by which the success of a solution is assessed, but rather a series of conflicting objectives, between which some compromise must be reached. We denote the $\nobj$ conflicting objective functions by $f_i(\bx)$, $i = 1, \ldots, \nobj$, so that the MOP may be expressed 
@@ -291,31 +297,43 @@ as
 \begin{equation}\label{eqn: min_F}
 \underset{\mathbf{x} \in \mX}{\argmin}\:\mathbf{f}(\mathbf{x}), 
 \end{equation}
-where $\parameterspace \subset \mathbb{R}^n$ is the feasible space and and $\mathbf{f}: \Omega \mapsto \mathbb{R}^{D}$.
+where $\parameterspace \subset \mathbb{R}^\ndim$ is the feasible space and and $\mathbf{f}: \Omega \mapsto \mathbb{R}^{\nobj}$.
 
-A solution $\bx$ is said to dominate another $\bx'$ (denoted $\bx \prec \bx'$) if $f_i(\bx) \le f_i(\bx')$ for $i = 1, \ldots, D$ and $ f_i(\bx) < f_i(\bx')$ for at least one $i$. Since in most cases with conflicting objectives there is no single dominating solution, the goal of most multi-objective optimisation algorithms is to produce a number of solutions which well represent the Pareto set, that is the maximal set of solutions that are not dominated by any other solutions in the feasible space:
+A solution $\bx$ is said to dominate another $\bx'$ (denoted $\bx \prec \bx'$) if $f_i(\bx) \le f_i(\bx')$ for $i = 1, \ldots, \nobj$ and $ f_i(\bx) < f_i(\bx')$ for at least one $i$. Since in most cases with conflicting objectives there is no single dominating solution, the goal of most multi-objective optimisation algorithms is to produce a number of solutions which well represent the Pareto set, that is the maximal set of solutions that are not dominated by any other solutions in the feasible space:
 \begin{equation}\label{eqn: Pareto_set}
   \paretoset = \{\mathbf{x} \in \parameterspace \;:\;
   \bx' \not\prec \bx \,\forall \bx' \in \parameterspace \}.
 \end{equation}
 %This is referred to as the summary attainment front (SAF),\mnote{no it is not -- you are confusing spaces and constructs here} and t
-The image of $\paretoset$ under $\bff$ is the Pareto front ($\paretofront$). Typically in multi-objective optimisation the best we can aspire to is an \emph{approximation} this, as represented by a set of mutually non-dominating solutions. The $\nobj-1$ dimensional surface in objective space which separates the area/volume dominated by any element of this set from that which is non-dominated is known as the summary attainment front (SAF), hereby denoted $\attainmentfront$, and its parameters $\attainmentset$.
-\begin{equation}\label{eqn: Attainment_set}
-  \attainmentset = \{\mathbf{x} \in \evaluatedx \;:\;
-  \bx' \not\prec \bx \,\forall \bx' \in \evaluatedx \}.
-\end{equation}
-Multi-objective Bayesian optimisation is the extension of the process described in secion \ref{section:background_BayesianOptimisation} to the multi-objective setting in \ref{section:background_MOPs}. Methods of Bayesian optimisation for MOPs generally fall into one of two categories: single surrogate approaches and multi-surrogate approaches. In a multi-surrogate approach, each objective $f_i$ is modelled individually by its own separate surrogate $g_i(\bx)$. These models are usually considered to be independent, thus ignoring
-cross-correlations between the models and resulting in $D$, mono-variate probability density functions. An acquisition function is then used to combine these distributions into a scalar quality measure:
-\begin{equation}\label{eqn: eqn: max_alpha_mop}
-   \bx' = \underset{\mathbf{x}\in \parameterspace}{\argmax}\:\alpha(\mathbf{x}; \{\theta_i\}_{i=1}^{\nobj})
-\end{equation}
-where $\theta_i$ denotes the parameters of the trained surrogate model of $f_i(\bx)$, and $g_i \mapsto \mathbb{R}$. In single surrogate models the $D$ objective functions are jointly modelled by a single function $g(\bx) \sim \bff(\bx)$, such that $g \mapsto \mathbb{R}^D$, and the $D$ dimensional vector $ \mathbf{g} \gets g(\bx)$ is combined into a scalar value by the acquisition function which is subsequently maximised to find the next location for expensive evaluation.
-\begin{equation}\label{eqn: eqn: max_alpha_monosurrogate}
-   \bx' = \underset{\mathbf{x}\in \parameterspace}{\argmax}\:\alpha(\mathbf{x}; \theta).
-\end{equation}
-Practical experience shows that multi-surrogate methods tend to be superior to mono-surrogate approaches because a single \gp is unable to effectively model the highly complex function formed by the aggregated objectives, whereas each of the GPs in a multi-surrogate approach has the simpler task of modelling a single objective function \cite{rahat2017alternative}. 
+The image of $\paretoset$ under $\bff$ is the Pareto front ($\paretofront$). Since $\paretofront$ may contain infinitely many elements, usually  in multi-objective optimisation the best we can aspire to is an \emph{approximation} $\Papprox$, as represented by a set of mutually non-dominating solutions.
 
-Acquisition functions are more complex in MOPs than in single objective Bayesian optimisation, as the acquisition function must additionally combine the vector of surrogate predictions for each objective into a scalar value. Generalisations of \ei and PI to MOPs have been made by deploying mono-surrogates to jointly model the parameter space/objective space mapping, and then multi-dimensional integration is applied to calculate the probability density function for a given set of parameters \cite{emmerich2006single,keane2006statistical}. The disadvantage of this is that multi-dimensional integration is computationally expensive and quickly becomes impractical due to the \textit{curse of dimensionality} associated with the dimensional increase resulting from the inclusion of additional objectives. More generally the acquisition function involves a function to interpolate between the explored points in the objective space, and then posterior predictions from the surrogate/surrogates are evaluated against this in order to quantify their suitability as candidates. 
+% The $\nobj-1$ dimensional surface in objective space which separates the area/volume dominated by any element of this set from that which is non-dominated is known as the summary attainment front (SAF), hereby denoted $\attainmentfront$, and its parameters $\attainmentset$.
+% \begin{equation}\label{eqn: Attainment_set}
+%   \attainmentset = \{\mathbf{x} \in \evaluatedx \;:\;
+%   \bx' \not\prec \bx \,\forall \bx' \in \evaluatedx \}.
+% \end{equation}
+
+% Multi-objective Bayesian optimisation is the extension of the process described in secion \ref{section:background_BayesianOptimisation} to the multi-objective setting in \ref{section:background_MOPs}.
+
+Methods of Bayesian optimisation for MOPs generally fall into one of two categories: single surrogate approaches and multi-surrogate approaches. In a multi-surrogate approach, each objective $f_i$ is modelled individually by its own separate surrogate which models $p(f_i(\bx \given \data)$. These models are  considered to be independent, thus ignoring
+cross-correlations between the models and the $p(f_i \given \bx, \data)$ are multiplied together to form the joint density $p(\bff \given \bx, \data) = \prod_{i=1}^\nobj p(f_i \given \bx, \data) $.   In addition, a scalarising function or infill criterion $g : \mathbb{R}^\nobj \mapsto \mathbb{R}$ is used to evaluate the quality of any modelled solution.  For example, the hypervolume improvement of a modelled Pareto front over the current estimated Pareto front might be used as an scalarising function.  
+
+The alternative mono-surrogate approach aggregates the $\nobj$ objective functions $g(\bx) = g(\bff(\bx))$.  Then a surrogate model of $g(\bx)$ is constructed for use in the standard BO algorithm. Practical experience shows that multi-surrogate methods tend to be superior to mono-surrogate approaches because a single \gp surrogate is unable to effectively model the highly complex function formed by the aggregated objectives, whereas each of the GPs in a multi-surrogate approach has the simpler task of modelling a single objective function \cite{rahat2017alternative}.   
+
+
+is to use a surrogate to directly model the multivariate $\bff(\bx)$.   An infill criterion is used to measure the quality of  a proposed 
+
+An acquisition function or infill criterion is then used to derive a scalar value which is maximised to find the next location to be expensively evaluated.  The alternative mono-surrogate approach is to use a surrogate to directly model the multivariate $\bff(\bx)$ from which the infill criterion is derived. 
+% An acquisition function is then used to combine these distributions into a scalar quality measure:
+% \begin{equation}\label{eqn: eqn: max_alpha_mop}
+%    \bx' = \underset{\mathbf{x}\in \parameterspace}{\argmax}\:\alpha(\mathbf{x}; \{\theta_i\}_{i=1}^{\nobj})
+% \end{equation}
+% where $\theta_i$ denotes the parameters of the trained surrogate model of $f_i(\bx)$, and $g_i \mapsto \mathbb{R}$. In single surrogate models the $D$ objective functions are jointly modelled by a single function $g(\bx) \sim \bff(\bx)$, such that $g \mapsto \mathbb{R}^D$, and the $D$ dimensional vector $ \mathbf{g} \gets g(\bx)$ is combined into a scalar value by the acquisition function which is subsequently maximised to find the next location for expensive evaluation.
+% \begin{equation}\label{eqn: eqn: max_alpha_monosurrogate}
+%    \bx' = \underset{\mathbf{x}\in \parameterspace}{\argmax}\:\alpha(\mathbf{x}; \theta).
+% \end{equation}
+
+Acquisition functions are more complex in MOPs than in single objective Bayesian optimisation, as the acquisition function must additionally combine the vector of surrogate predictions for each objective into a scalar value. Generalisations of \ei and PI to MOPs have been made by deploying mono-surrogates to jointly model the parameter space/objective space mapping, and then multi-dimensional integration is used to calculate the probability density function for a given set of parameters \cite{emmerich2006single,keane2006statistical}. The disadvantage of this is that multi-dimensional integration is computationally expensive and quickly becomes impractical due to the \textit{curse of dimensionality} associated with the dimensional increase resulting from the inclusion of additional objectives. More generally the acquisition function involves a function to interpolate between the explored points in the objective space, and then posterior predictions from the surrogate/surrogates are evaluated against this in order to quantify their suitability as candidates. 
 
 \subsection{Related work}\label{section:related_work}
 Bayesian approaches to solving MOPs tend to use Gaussian Process surrogates and largely differ in the acquisition functions by which they select the parameters at which to next evaluate the true objective function.
@@ -531,12 +549,14 @@ Measurements using \igd rely on a set of reference points $\pigdref$ on the prob
 \sisetup{table-format=1.2e-1,table-number-alignment=center}
 \resizebox{\columnwidth}{!}{%
 \import{tables/}{hv_table_1.tex}}
+\smallskip
 \end{subtable}
 \begin{subtable}[b]{\columnwidth}
 \setlength{\tabcolsep}{2pt}
 \sisetup{table-format=1.2e-1,table-number-alignment=center}
 \resizebox{\columnwidth}{!}{%
 \import{tables/}{hv_table_2.tex}}
+\smallskip
 \end{subtable}
 \begin{subtable}[b]{\columnwidth}
 \setlength{\tabcolsep}{2pt}
@@ -555,12 +575,14 @@ Measurements using \igd rely on a set of reference points $\pigdref$ on the prob
 \sisetup{table-format=1.2e-1,table-number-alignment=center}
 \resizebox{\columnwidth}{!}{%
 \import{tables/}{igd_table_1.tex}}
+\smallskip
 \end{subtable}
 \begin{subtable}[b]{\columnwidth}
 \setlength{\tabcolsep}{2pt}
 \sisetup{table-format=1.2e-1,table-number-alignment=center}
 \resizebox{\columnwidth}{!}{%
 \import{tables/}{igd_table_2.tex}}
+\smallskip
 \end{subtable}
 \begin{subtable}[b]{\columnwidth}
 \setlength{\tabcolsep}{2pt}
@@ -612,7 +634,7 @@ All optimisers performed poorly on WFG2, with the majority of the Pareto Front l
      \end{subfigure}
 \begin{subfigure}[b]{\columnwidth}
          \centering
-         \includegraphics[width=\columnwidth]{figures/wfg6_3obj_6dim_hv_plot.pdf}
+         \includegraphics[width=\columnwidth]{figures/wfg5_3obj_8dim_hv_plot.pdf}
          \caption{}
          \label{fig: exemplar_pf_sms_saf_hv}
      \end{subfigure}
@@ -625,9 +647,11 @@ More often than not, the \smsegomu method, which uses the \gp posterior mean pre
 
 \section{Conclusion}
 \label{sec:conclusion}
-When optimising expensive, multi-objective problems efficient use of objective evaluations is critical to convergence within the constraining budget. Current state-of-the-art methods for optimising such problems in few evaluations rely on expensive hypervolume computation which can itself become prohibitively costly as the number of objectives is scaled, and the number of non-dominated solutions in the attainment surface increases. The state-of-the art method is benchmarked on a comprehensive set of synthetic test problems, and an optimisation method based on a cheap, exploitative, \maximin distance infill criteria method from the attainment surface is presented and shown to be similarly effective across the test problems. The leading efficient methods are also tested, and surpassed in the majority of tested functions by our proposed approach. 
+When optimising expensive, multi-objective problems efficient use of objective evaluations is critical to convergence within the constraining budget. Current state-of-the-art methods for optimising such problems in few evaluations rely on expensive \hpv computations which can themselves become prohibitively costly as the number of objectives is scaled, and the number of solutions on the attainment surface increases. 
 
-Optimiser performance is shown to vary quite widely between different problems, with certain examples optimised poorly by all those methods tested. Exploitative methods are frequently shown to suffer no detriment compared to alternatives, which leverage the posterior prediction uncertainty, in the majority of cases tested, suggesting that deploying surrogates which are better able to model the broader ranges of objective functions, without providing predictive uncertainty may yield better results. 
+A novel optimisation method is presented, producing state-of-the-art results, with low computational complexity, and without reliance on \hpv computation. Our method is benchmarked against current leading methods, shown to be similarly effective over the problems tested to the state-of-the-art, and shown to surpasses the leading low-complexity alternatives in the majority of objectives tested. 
+
+We further show that exploiting the mean prediction of the surrogate model is more often than not superior to leveraging the posterior prediction uncertainty in order to deliberate exploration of the objective space. 
 
 
 % \section{Definitions required}
